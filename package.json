@@ -4,12 +4,16 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "slidev --open",
-    "build": "npm run build:all",
-    "build:all": "slidev build SRE-NEXT-2025/slides.md --out dist/sre-next-2025 --base /sre-next-2025/ && npm run build:index",
+    "dev": "slidev --open SRE-NEXT-2025/slides.md",
+    "build": "npm run clean && npm run build:all && npm run build:index",
+    "clean": "rm -rf dist",
+    "build:all": "npm run build:sre-next",
+    "build:sre-next": "slidev build SRE-NEXT-2025/slides.md --out dist/sre-next-2025 --base /sre-next-2025/",
     "build:index": "node scripts/build-index.js",
-    "export": "slidev export",
-    "format": "slidev format"
+    "preview": "npx serve dist",
+    "export": "npm run export:sre-next-pdf",
+    "export:sre-next-pdf": "slidev export SRE-NEXT-2025/slides.md --output exports/sre-next-2025.pdf",
+    "format": "slidev format SRE-NEXT-2025/slides.md"
   },
   "dependencies": {
     "@slidev/cli": "^0.52.4",
@@ -18,5 +22,9 @@
   },
   "devDependencies": {
     "playwright-chromium": "^1.45.1"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
   }
 }
