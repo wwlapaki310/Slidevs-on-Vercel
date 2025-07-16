@@ -6,6 +6,11 @@
   "regions": ["nrt1"],
   "cleanUrls": true,
   "trailingSlash": false,
+  "functions": {
+    "app/**/*.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
   "rewrites": [
     {
       "source": "/sre-next-2025/(.*)",
