@@ -16,7 +16,7 @@
     "format": "slidev format SRE-NEXT-2025/slides.md"
   },
   "dependencies": {
-    "@slidev/cli": "^0.52.4",
+    "@slidev/cli": "^52.0.0",
     "@slidev/theme-default": "latest",
     "vue": "^3.4.31"
   },
