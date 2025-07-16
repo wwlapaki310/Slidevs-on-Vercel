@@ -1,0 +1,22 @@
+{
+  "name": "my-slidev-presentations",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "slidev --open",
+    "build": "npm run build:all",
+    "build:all": "slidev build SRE-NEXT-2025/slides.md --out dist/sre-next-2025 --base /sre-next-2025/ && npm run build:index",
+    "build:index": "node scripts/build-index.js",
+    "export": "slidev export",
+    "format": "slidev format"
+  },
+  "dependencies": {
+    "@slidev/cli": "^0.52.4",
+    "@slidev/theme-default": "latest",
+    "vue": "^3.4.31"
+  },
+  "devDependencies": {
+    "playwright-chromium": "^1.45.1"
+  }
+}
