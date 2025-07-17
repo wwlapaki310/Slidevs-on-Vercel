@@ -1,26 +1,2 @@
-lockfileVersion: '6.0'
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
-importers:
-
-  .:
-    dependencies:
-      '@slidev/cli':
-        specifier: ^0.52.8
-        version: 0.52.8
-      '@slidev/theme-default':
-        specifier: latest
-        version: 0.25.0
-      vue:
-        specifier: ^3.4.31
-        version: 3.4.31
-    devDependencies:
-      playwright-chromium:
-        specifier: ^1.45.1
-        version: 1.45.1
-
-  sre-next-2025/src:
-    dependencies: {}
+# pnpm-lock.yaml removed to fix npm ci error
+# This file will be regenerated as package-lock.json for npm compatibility
