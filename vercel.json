@@ -6,24 +6,6 @@
   "regions": ["hnd1"],
   "cleanUrls": true,
   "trailingSlash": false,
-  "rewrites": [
-    {
-      "source": "/sre-next-2025",
-      "destination": "/sre-next-2025/index.html"
-    },
-    {
-      "source": "/sre-next-2025/(.*)",
-      "destination": "/sre-next-2025/$1"
-    },
-    {
-      "source": "/slidev-system",
-      "destination": "/slidev-system/index.html"
-    },
-    {
-      "source": "/slidev-system/(.*)",
-      "destination": "/slidev-system/$1"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",
