@@ -10,15 +10,6 @@ const presentations = [
     lastUpdated: '2025-07-16',
     tags: ['SRE', 'NoC', 'インフラ', '運用']
   }
-  // 一旦1つだけでテスト
-  // {
-  //   title: 'Slidev複数プレゼンテーション - 自動デプロイシステム',
-  //   description: 'GitHub + Vercel で実現する完全自動化されたCI/CDワークフローの解説',
-  //   path: '/slidev-system/',
-  //   folder: 'SLIDEV-SYSTEM',
-  //   lastUpdated: '2025-07-17',
-  //   tags: ['Slidev', 'CI/CD', 'Vercel', 'GitHub', '自動化']
-  // }
 ];
 
 // ファイル構造をデバッグするための関数
@@ -51,8 +42,52 @@ const generateIndexPage = () => {
   console.log('🚀 Building index page...');
   console.log(`🎯 Testing with ${presentations.length} presentation(s)`);
   
+  // 現在のワーキングディレクトリを確認
+  console.log(`📍 Current working directory: ${process.cwd()}`);
+  
+  // 絶対パスでdistディレクトリの存在を確認
+  const distPath = path.resolve(process.cwd(), 'dist');
+  console.log(`📍 Absolute dist path: ${distPath}`);
+  console.log(`📍 Dist exists: ${fs.existsSync(distPath)}`);
+  
+  // ルートディレクトリの内容を確認
+  console.log('\n🔍 Root directory contents:');
+  try {
+    const rootItems = fs.readdirSync(process.cwd());
+    rootItems.forEach(item => {
+      const itemPath = path.join(process.cwd(), item);
+      const stat = fs.statSync(itemPath);
+      if (stat.isDirectory()) {
+        console.log(`📁 ${item}/`);
+      } else {
+        console.log(`📄 ${item}`);
+      }
+    });
+  } catch (error) {
+    console.log(`❌ Error reading root directory:`, error.message);
+  }
+  
+  // 可能な場所でSlidevの出力を探す
+  console.log('\n🔍 Searching for Slidev output in possible locations:');
+  const possiblePaths = [
+    'dist',
+    './dist', 
+    'dist/sre-next-2025',
+    './dist/sre-next-2025',
+    path.resolve('dist'),
+    path.resolve('dist/sre-next-2025')
+  ];
+  
+  possiblePaths.forEach(searchPath => {
+    if (fs.existsSync(searchPath)) {
+      console.log(`✅ Found: ${searchPath}`);
+      debugFileStructure(searchPath, '  ');
+    } else {
+      console.log(`❌ Not found: ${searchPath}`);
+    }
+  });
+  
   // IMPORTANT: distディレクトリが存在しない場合のみ作成
-  // Slidevが既に生成した内容を保持する
   if (!fs.existsSync('dist')) {
     console.log('📁 Creating dist directory...');
     fs.mkdirSync('dist', { recursive: true });
@@ -60,8 +95,8 @@ const generateIndexPage = () => {
     console.log('📁 Dist directory already exists - preserving Slidev output');
   }
   
-  // まず現在のファイル構造を確認
-  console.log('\n🔍 Current dist structure before checking presentations:');
+  // 現在のファイル構造を再確認
+  console.log('\n🔍 Current dist structure after ensuring dist exists:');
   debugFileStructure('dist');
   
   // 既存のSlidevプレゼンテーションをチェック
@@ -69,6 +104,9 @@ const generateIndexPage = () => {
   presentations.forEach(p => {
     const presentationDir = `dist${p.path}`;
     const indexFile = path.join(presentationDir, 'index.html');
+    
+    console.log(`  Checking: ${presentationDir}`);
+    console.log(`  Absolute path: ${path.resolve(presentationDir)}`);
     
     if (fs.existsSync(presentationDir)) {
       console.log(`✅ Found: ${p.path}`);
@@ -78,6 +116,10 @@ const generateIndexPage = () => {
       } else {
         console.log(`   ❌ index.html not found`);
       }
+      
+      // ディレクトリ内容を表示
+      console.log(`   📁 Contents of ${presentationDir}:`);
+      debugFileStructure(presentationDir, '     ');
     } else {
       console.log(`❌ Missing: ${p.path}`);
     }
@@ -372,15 +414,16 @@ const generateIndexPage = () => {
       <p class="subtitle">技術プレゼンテーション集 - Powered by Slidev & Vercel</p>
       
       <div class="debug-info">
-        <strong>🔍 Build Status (Fixed Version):</strong><br>
+        <strong>🔍 Enhanced Debug Mode:</strong><br>
         Build Time: ${new Date().toISOString()}<br>
+        Working Dir: ${process.cwd()}<br>
         Presentations Expected: ${presentations.length}<br>
         ${presentations.map(p => {
           const exists = fs.existsSync(`dist${p.path}index.html`);
           return `<span class="status-indicator ${exists ? 'status-ok' : 'status-error'}"></span>${p.path} ${exists ? '✅' : '❌'}`;
         }).join('<br>')}<br>
         <br>
-        <strong>🔧 Fixed: Preserving Slidev output during index generation</strong>
+        <strong>🔧 Enhanced debugging to locate Slidev output</strong>
       </div>
       
       <div class="stats">
@@ -432,7 +475,7 @@ const generateIndexPage = () => {
 </html>`;
 
   try {
-    // Write index.html (dist ディレクトリは既に存在し、Slidevの出力も含まれている)
+    // Write index.html
     fs.writeFileSync('dist/index.html', indexHtml);
     console.log('✅ Index page built successfully!');
     console.log(`📊 Generated index for ${presentations.length} presentation(s)`);
