@@ -1,24 +1,18 @@
 {
-  "name": "my-slidev-presentations",
-  "version": "1.0.0",
+  "name": "sre-next-2025",
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "slidev --open SRE-NEXT-2025/slides.md",
-    "build": "slidev build SRE-NEXT-2025/slides.md",
-    "preview": "slidev preview SRE-NEXT-2025/slides.md",
-    "export": "slidev export SRE-NEXT-2025/slides.md --output sre-next-2025.pdf"
+    "build": "slidev build",
+    "dev": "slidev --open",
+    "export": "slidev export"
   },
   "dependencies": {
-    "@slidev/cli": "^52.0.0",
+    "@slidev/cli": "^0.52.8",
     "@slidev/theme-default": "latest",
     "vue": "^3.4.31"
   },
   "devDependencies": {
     "playwright-chromium": "^1.45.1"
-  },
-  "engines": {
-    "node": ">=20.0.0",
-    "npm": ">=10.0.0"
   }
 }
