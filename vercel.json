@@ -1,14 +1,5 @@
 {
   "rewrites": [
-    { 
-      "source": "/sre-next-2025/(.*)", 
-      "destination": "/sre-next-2025/index.html" 
-    },
-    { 
-      "source": "/", 
-      "destination": "/index.html" 
-    }
-  ],
-  "buildCommand": "pnpm run build",
-  "installCommand": "pnpm install --no-frozen-lockfile"
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
