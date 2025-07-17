@@ -6,7 +6,7 @@ const presentations = [
     title: 'SRE NEXT 2025 - NoCスタッフをやった話',
     description: 'SRE NEXT2025でNoCスタッフをやった話とSRE NEXTの講演紹介',
     path: '/sre-next-2025/',
-    folder: 'sre-next-2025',  // 新しいディレクトリ構造に対応
+    folder: 'sre-next-2025',
     lastUpdated: '2025-07-17',
     tags: ['SRE', 'NoC', 'インフラ', '運用']
   }
@@ -39,67 +39,13 @@ const debugFileStructure = (dir, prefix = '') => {
 };
 
 const generateIndexPage = () => {
-  console.log('🚀 Building index page for workspace structure...');
-  console.log(`🎯 Testing with ${presentations.length} presentation(s)`);
+  console.log('🔧 Building index page - Fixed workspace structure');
+  console.log(`🎯 Building for ${presentations.length} presentation(s)`);
   
   // 現在のワーキングディレクトリを確認
-  console.log(`📍 Current working directory: ${process.cwd()}`);
+  console.log(`📍 Working directory: ${process.cwd()}`);
   
-  // 絶対パスでdistディレクトリの存在を確認
-  const distPath = path.resolve(process.cwd(), 'dist');
-  console.log(`📍 Absolute dist path: ${distPath}`);
-  console.log(`📍 Dist exists: ${fs.existsSync(distPath)}`);
-  
-  // ワークスペース構造での確認
-  console.log('\n🔍 Checking workspace structure:');
-  const workspaceStructure = ['sre-next-2025', 'sre-next-2025/src'];
-  workspaceStructure.forEach(wsPath => {
-    if (fs.existsSync(wsPath)) {
-      console.log(`✅ Found workspace: ${wsPath}`);
-      debugFileStructure(wsPath, '  ');
-    } else {
-      console.log(`❌ Missing workspace: ${wsPath}`);
-    }
-  });
-  
-  // ルートディレクトリの内容を確認
-  console.log('\n🔍 Root directory contents:');
-  try {
-    const rootItems = fs.readdirSync(process.cwd());
-    rootItems.forEach(item => {
-      const itemPath = path.join(process.cwd(), item);
-      const stat = fs.statSync(itemPath);
-      if (stat.isDirectory()) {
-        console.log(`📁 ${item}/`);
-      } else {
-        console.log(`📄 ${item}`);
-      }
-    });
-  } catch (error) {
-    console.log(`❌ Error reading root directory:`, error.message);
-  }
-  
-  // 可能な場所でSlidevの出力を探す
-  console.log('\n🔍 Searching for Slidev output in possible locations:');
-  const possiblePaths = [
-    'dist',
-    './dist', 
-    'dist/sre-next-2025',
-    './dist/sre-next-2025',
-    path.resolve('dist'),
-    path.resolve('dist/sre-next-2025')
-  ];
-  
-  possiblePaths.forEach(searchPath => {
-    if (fs.existsSync(searchPath)) {
-      console.log(`✅ Found: ${searchPath}`);
-      debugFileStructure(searchPath, '  ');
-    } else {
-      console.log(`❌ Not found: ${searchPath}`);
-    }
-  });
-  
-  // IMPORTANT: distディレクトリが存在しない場合のみ作成
+  // distディレクトリの確認
   if (!fs.existsSync('dist')) {
     console.log('📁 Creating dist directory...');
     fs.mkdirSync('dist', { recursive: true });
@@ -107,18 +53,19 @@ const generateIndexPage = () => {
     console.log('📁 Dist directory already exists - preserving Slidev output');
   }
   
-  // 現在のファイル構造を再確認
-  console.log('\n🔍 Current dist structure after ensuring dist exists:');
+  // 現在のファイル構造を確認
+  console.log('\n🔍 Current workspace structure:');
+  debugFileStructure('.');
+  
+  // dist構造の確認
+  console.log('\n🔍 Current dist structure:');
   debugFileStructure('dist');
   
   // 既存のSlidevプレゼンテーションをチェック
-  console.log('\n🔍 Checking for existing Slidev presentations:');
+  console.log('\n🔍 Checking for Slidev presentations:');
   presentations.forEach(p => {
     const presentationDir = `dist${p.path}`;
     const indexFile = path.join(presentationDir, 'index.html');
-    
-    console.log(`  Checking: ${presentationDir}`);
-    console.log(`  Absolute path: ${path.resolve(presentationDir)}`);
     
     if (fs.existsSync(presentationDir)) {
       console.log(`✅ Found: ${p.path}`);
@@ -130,7 +77,6 @@ const generateIndexPage = () => {
       }
       
       // ディレクトリ内容を表示
-      console.log(`   📁 Contents of ${presentationDir}:`);
       debugFileStructure(presentationDir, '     ');
     } else {
       console.log(`❌ Missing: ${p.path}`);
@@ -426,17 +372,17 @@ const generateIndexPage = () => {
       <p class="subtitle">技術プレゼンテーション集 - Powered by Slidev & Vercel</p>
       
       <div class="debug-info">
-        <strong>🔍 Phase 2 Debug Mode:</strong><br>
+        <strong>🔧 Fixed pnpm workspace build:</strong><br>
         Build Time: ${new Date().toISOString()}<br>
         Working Dir: ${process.cwd()}<br>
-        Workspace Structure: ✅ pnpm workspace<br>
+        Build Command: pnpm run -r build && node scripts/build-index.js<br>
         Presentations Expected: ${presentations.length}<br>
         ${presentations.map(p => {
           const exists = fs.existsSync(`dist${p.path}index.html`);
           return `<span class="status-indicator ${exists ? 'status-ok' : 'status-error'}"></span>${p.path} ${exists ? '✅' : '❌'}`;
         }).join('<br>')}<br>
         <br>
-        <strong>🔧 Workspace-based build system active</strong>
+        <strong>🚀 Workspace-based build fixed</strong>
       </div>
       
       <div class="stats">
@@ -490,7 +436,7 @@ const generateIndexPage = () => {
   try {
     // Write index.html
     fs.writeFileSync('dist/index.html', indexHtml);
-    console.log('✅ Index page built successfully for workspace structure!');
+    console.log('✅ Index page built successfully with fixed workspace structure!');
     console.log(`📊 Generated index for ${presentations.length} presentation(s)`);
     
     // Create a simple robots.txt for SEO
@@ -519,20 +465,20 @@ const generateIndexPage = () => {
     fs.writeFileSync('dist/sitemap.xml', sitemap);
     console.log('🗺️ sitemap.xml created');
     
-    // 最終的なファイル構造を確認（この時点では全て完了しているはず）
+    // 最終的なファイル構造を確認
     console.log('\n📋 Final dist structure:');
     debugFileStructure('dist');
     
   } catch (error) {
     console.error('❌ Build failed:', error);
-    process.exit(1); // ビルド失敗時はデプロイ停止
+    process.exit(1);
   }
 };
 
 // エラーハンドリング付きで実行
 try {
   generateIndexPage();
-  console.log('🎉 Phase 2 workspace build completed successfully');
+  console.log('🎉 Fixed workspace build completed successfully');
 } catch (error) {
   console.error('💥 Fatal error during build:', error);
   process.exit(1);
