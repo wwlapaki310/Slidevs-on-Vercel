@@ -1,9 +1,10 @@
 {
   "name": "my-slidev-presentations",
+  "version": "1.0.0",
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "slidev build --base /sre-next-2025/ --out dist/sre-next-2025 && node scripts/build-index.js",
+    "build": "slidev build --base /sre-next-2025/ --out dist/sre-next-2025",
     "dev": "slidev --open",
     "export": "slidev export"
   },
