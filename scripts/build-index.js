@@ -50,9 +50,30 @@ const debugFileStructure = (dir, prefix = '') => {
 const generateIndexPage = () => {
   console.log('🚀 Building index page...');
   
-  // デバッグ: ビルド後のディレクトリ構造を確認
-  console.log('\n🔍 Checking dist directory structure:');
-  debugFileStructure('dist');
+  // distディレクトリが存在することを確認
+  if (!fs.existsSync('dist')) {
+    console.log('📁 Creating dist directory...');
+    fs.mkdirSync('dist', { recursive: true });
+  }
+  
+  // 既存のSlidevプレゼンテーションをチェック
+  console.log('\n🔍 Checking for existing Slidev presentations:');
+  presentations.forEach(p => {
+    const presentationDir = `dist${p.path}`;
+    const indexFile = path.join(presentationDir, 'index.html');
+    
+    if (fs.existsSync(presentationDir)) {
+      console.log(`✅ Found: ${p.path}`);
+      if (fs.existsSync(indexFile)) {
+        const stats = fs.statSync(indexFile);
+        console.log(`   📄 index.html (${stats.size} bytes)`);
+      } else {
+        console.log(`   ❌ index.html not found`);
+      }
+    } else {
+      console.log(`❌ Missing: ${p.path}`);
+    }
+  });
   
   const indexHtml = `<!DOCTYPE html>
 <html lang="ja">
@@ -256,6 +277,22 @@ const generateIndexPage = () => {
       color: white;
     }
     
+    .status-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+    }
+    
+    .status-ok {
+      background-color: #28a745;
+    }
+    
+    .status-error {
+      background-color: #dc3545;
+    }
+    
     footer {
       text-align: center;
       padding-top: 2rem;
@@ -327,10 +364,13 @@ const generateIndexPage = () => {
       <p class="subtitle">技術プレゼンテーション集 - Powered by Slidev & Vercel</p>
       
       <div class="debug-info">
-        <strong>🔍 Debug Info:</strong><br>
+        <strong>🔍 Build Status:</strong><br>
         Build Time: ${new Date().toISOString()}<br>
-        Presentations: ${presentations.length}<br>
-        Expected Paths: ${presentations.map(p => p.path).join(', ')}
+        Presentations Expected: ${presentations.length}<br>
+        ${presentations.map(p => {
+          const exists = fs.existsSync(`dist${p.path}index.html`);
+          return `<span class="status-indicator ${exists ? 'status-ok' : 'status-error'}"></span>${p.path} ${exists ? '✅' : '❌'}`;
+        }).join('<br>')}<br>
       </div>
       
       <div class="stats">
@@ -382,11 +422,6 @@ const generateIndexPage = () => {
 </html>`;
 
   try {
-    // Create dist directory if it doesn't exist
-    if (!fs.existsSync('dist')) {
-      fs.mkdirSync('dist', { recursive: true });
-    }
-
     // Write index.html
     fs.writeFileSync('dist/index.html', indexHtml);
     console.log('✅ Index page built successfully!');
@@ -418,7 +453,7 @@ const generateIndexPage = () => {
     fs.writeFileSync('dist/sitemap.xml', sitemap);
     console.log('🗺️ sitemap.xml created');
     
-    // 最終的なファイル構造を再度確認
+    // 最終的なファイル構造を確認（この時点では全て完了しているはず）
     console.log('\n📋 Final dist structure:');
     debugFileStructure('dist');
     
