@@ -6,6 +6,16 @@
   "regions": ["hnd1"],
   "cleanUrls": true,
   "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/sre-next-2025/(.*)",
+      "destination": "/sre-next-2025/index.html"
+    },
+    {
+      "source": "/slidev-system/(.*)",
+      "destination": "/slidev-system/index.html"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -26,6 +36,24 @@
     },
     {
       "source": "/index.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/sre-next-2025/**",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/slidev-system/**",
       "headers": [
         {
           "key": "Cache-Control",
