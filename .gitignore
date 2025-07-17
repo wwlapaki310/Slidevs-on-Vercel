@@ -1,0 +1,17 @@
+node_modules
+.DS_Store
+dist
+*.local
+.output
+.vercel
+.netlify
+.nitro
+.cache
+.temp
+.tmp
+
+# Temporarily ignore broken lockfile - let pnpm regenerate it
+pnpm-lock.yaml
+
+# Build artifacts
+*.log
