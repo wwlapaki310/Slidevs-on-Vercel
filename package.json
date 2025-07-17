@@ -2,12 +2,13 @@
   "name": "my-slidev-presentations",
   "type": "module",
   "private": true,
-  "packageManager": "pnpm@9.5.0",
   "scripts": {
-    "build": "pnpm run -r build && node scripts/build-index.js"
+    "build": "slidev build",
+    "dev": "slidev --open",
+    "export": "slidev export"
   },
   "dependencies": {
-    "@slidev/cli": "^0.52.8",
+    "@slidev/cli": "52.0.0",
     "@slidev/theme-default": "latest",
     "vue": "^3.4.31"
   },
