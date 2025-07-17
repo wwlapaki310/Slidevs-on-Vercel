@@ -6,10 +6,10 @@
   "scripts": {
     "dev": "slidev --open SRE-NEXT-2025/slides.md",
     "dev:system": "slidev --open SLIDEV-SYSTEM/slides.md",
-    "build": "echo '🚀 Starting build process...' && npm run clean && echo '✅ Clean completed' && npm run build:sre-next && echo '✅ SRE NEXT completed' && npm run build:index && echo '✅ Index completed'",
+    "build": "echo '🚀 Starting build process...' && npm run clean && echo '✅ Clean completed' && npm run build:sre-next && echo '✅ SRE NEXT completed' && npm run build:slidev-system && echo '✅ SLIDEV SYSTEM completed' && npm run build:index && echo '✅ Index completed'",
     "clean": "echo '🧹 Cleaning dist directory...' && rm -rf dist && echo '✅ Dist directory removed'",
     "build:sre-next": "echo '📊 Building SRE NEXT presentation...' && echo '📍 PWD before Slidev:' && pwd && echo '📍 Creating dist directory:' && mkdir -p dist && npx slidev build SRE-NEXT-2025/slides.md --out $(pwd)/dist/sre-next-2025 --base /sre-next-2025/ && echo '✅ SRE NEXT build completed' && echo '📋 Checking dist after Slidev build:' && ls -la dist/ && ls -la dist/sre-next-2025/ || echo '❌ Slidev output verification failed'",
-    "build:slidev-system": "echo '⚙️ Building Slidev System presentation...' && npx slidev build SLIDEV-SYSTEM/slides.md --out $(pwd)/dist/slidev-system --base /slidev-system/ && echo '✅ Slidev System build completed'",
+    "build:slidev-system": "echo '⚙️ Building Slidev System presentation...' && echo '📍 PWD before Slidev System:' && pwd && npx slidev build SLIDEV-SYSTEM/slides.md --out $(pwd)/dist/slidev-system --base /slidev-system/ && echo '✅ Slidev System build completed' && echo '📋 Checking dist after Slidev System build:' && ls -la dist/slidev-system/ || echo '❌ Slidev System output verification failed'",
     "build:index": "echo '🏠 Building index page...' && echo '📋 Pre-check dist status:' && ls -la dist/ 2>/dev/null || echo '❌ No dist directory before index build' && node scripts/build-index.js && echo '✅ Index page completed'",
     "build:full": "npm run clean && npm run build:sre-next && npm run build:slidev-system && npm run build:index",
     "preview": "npx serve dist",
