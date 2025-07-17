@@ -9,16 +9,16 @@ const presentations = [
     folder: 'SRE-NEXT-2025',
     lastUpdated: '2025-07-16',
     tags: ['SRE', 'NoC', 'インフラ', '運用']
-  },
-  {
-    title: 'Slidev複数プレゼンテーション - 自動デプロイシステム',
-    description: 'GitHub + Vercel で実現する完全自動化されたCI/CDワークフローの解説',
-    path: '/slidev-system/',
-    folder: 'SLIDEV-SYSTEM',
-    lastUpdated: '2025-07-17',
-    tags: ['Slidev', 'CI/CD', 'Vercel', 'GitHub', '自動化']
   }
-  // 新しいプレゼンテーション追加時はここに追加
+  // 一旦1つだけでテスト
+  // {
+  //   title: 'Slidev複数プレゼンテーション - 自動デプロイシステム',
+  //   description: 'GitHub + Vercel で実現する完全自動化されたCI/CDワークフローの解説',
+  //   path: '/slidev-system/',
+  //   folder: 'SLIDEV-SYSTEM',
+  //   lastUpdated: '2025-07-17',
+  //   tags: ['Slidev', 'CI/CD', 'Vercel', 'GitHub', '自動化']
+  // }
 ];
 
 // ファイル構造をデバッグするための関数
@@ -49,6 +49,7 @@ const debugFileStructure = (dir, prefix = '') => {
 
 const generateIndexPage = () => {
   console.log('🚀 Building index page...');
+  console.log(`🎯 Testing with ${presentations.length} presentation(s)`);
   
   // distディレクトリが存在することを確認
   if (!fs.existsSync('dist')) {
@@ -364,13 +365,15 @@ const generateIndexPage = () => {
       <p class="subtitle">技術プレゼンテーション集 - Powered by Slidev & Vercel</p>
       
       <div class="debug-info">
-        <strong>🔍 Build Status:</strong><br>
+        <strong>🔍 Build Status (Test Mode):</strong><br>
         Build Time: ${new Date().toISOString()}<br>
         Presentations Expected: ${presentations.length}<br>
         ${presentations.map(p => {
           const exists = fs.existsSync(`dist${p.path}index.html`);
           return `<span class="status-indicator ${exists ? 'status-ok' : 'status-error'}"></span>${p.path} ${exists ? '✅' : '❌'}`;
         }).join('<br>')}<br>
+        <br>
+        <strong>🎯 Testing with single presentation to isolate build issues</strong>
       </div>
       
       <div class="stats">
@@ -425,7 +428,7 @@ const generateIndexPage = () => {
     // Write index.html
     fs.writeFileSync('dist/index.html', indexHtml);
     console.log('✅ Index page built successfully!');
-    console.log(`📊 Generated index for ${presentations.length} presentations`);
+    console.log(`📊 Generated index for ${presentations.length} presentation(s)`);
     
     // Create a simple robots.txt for SEO
     const robotsTxt = `User-agent: *\nAllow: /\n\nSitemap: https://your-domain.vercel.app/sitemap.xml`;
