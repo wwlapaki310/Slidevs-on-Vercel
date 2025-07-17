@@ -1,4 +1,6 @@
 {
+  "installCommand": "npm install",
+  "buildCommand": "npm run build",
   "rewrites": [
     { "source": "/sre-next-2025/(.*)", "destination": "/sre-next-2025/index.html" },
     { "source": "/", "destination": "/index.html" }
