@@ -17,10 +17,10 @@ This repository contains multiple Slidev presentations with **automatic Vercel d
 .
 ├── SRE-NEXT-2025/          # SRE NEXT 2025 presentation
 │   └── slides.md            # Main slides content
+├── SLIDEV-SYSTEM/           # System overview presentation
+│   └── slides.md            # This repository explanation
 ├── scripts/
 │   └── build-index.js       # Script to build index page
-├── docs/
-│   └── VERCEL_SETUP.md      # Vercel deployment guide
 ├── package.json             # Dependencies and build scripts
 ├── vercel.json              # Vercel configuration
 └── README.md
@@ -46,11 +46,15 @@ npm install
 ### Development
 
 ```bash
-# Start development server for a specific presentation
+# Start development server for SRE NEXT presentation
 npm run dev
+
+# Start development server for system overview
+npm run dev:system
 
 # Or directly specify the presentation
 npx slidev SRE-NEXT-2025/slides.md
+npx slidev SLIDEV-SYSTEM/slides.md
 ```
 
 ### Building
@@ -71,9 +75,8 @@ npm run preview
 
 **または手動セットアップ:**
 
-1. **[📋 Vercel自動デプロイセットアップガイド](docs/VERCEL_SETUP.md)** を参照
-2. Vercelアカウントでこのリポジトリをインポート
-3. `git push`するだけで自動デプロイ！
+1. Vercelアカウントでこのリポジトリをインポート
+2. `git push`するだけで自動デプロイ！
 
 ### デプロイフロー
 ```
@@ -85,6 +88,7 @@ git push → GitHub → Vercel Webhook → 自動ビルド → 本番反映 🎉
 | タイトル | 説明 | URL | ステータス |
 |---------|------|-----|---------|
 | **SRE NEXT 2025** | NoCスタッフをやった話 & 講演紹介 | `/sre-next-2025/` | ✅ 公開中 |
+| **Slidev System** | 自動デプロイシステムの解説 | `/slidev-system/` | ✅ 公開中 |
 
 ## 🔧 Adding New Presentations
 
@@ -111,11 +115,11 @@ title: My New Talk
 EOF
 ```
 
-### Step 2: ビルド設定更新
+### Step 2: ビルドスクリプト更新
 ```json
 // package.json の scripts セクションに追加
 {
-  "build:all": "npm run build:sre-next && npm run build:new-talk",
+  "build:all": "npm run build:sre-next && npm run build:slidev-system && npm run build:new-talk",
   "build:new-talk": "slidev build MY-NEW-TALK/slides.md --out dist/my-new-talk --base /my-new-talk/"
 }
 ```
@@ -128,12 +132,21 @@ EOF
   description: 'Description of my new presentation',
   path: '/my-new-talk/',
   folder: 'MY-NEW-TALK',
-  lastUpdated: '2025-07-16',
+  lastUpdated: '2025-07-17',
   tags: ['技術', 'プレゼン']
 }
 ```
 
-### Step 4: デプロイ
+### Step 4: Vercel設定更新
+```json
+// vercel.json の rewrites に追加
+{
+  "source": "/my-new-talk/(.*)",
+  "destination": "/my-new-talk/$1"
+}
+```
+
+### Step 5: デプロイ
 ```bash
 git add .
 git commit -m "Add new presentation: My New Talk"
@@ -186,12 +199,6 @@ graph LR
 - Slack/Discord通知
 - メール通知
 
-## 📖 Documentation
-
-- **[🚀 Vercelデプロイガイド](docs/VERCEL_SETUP.md)** - 完全なセットアップ手順
-- **[Slidev公式ドキュメント](https://sli.dev/)** - Slidevの使い方
-- **[Vercel公式ドキュメント](https://vercel.com/docs)** - Vercelの詳細
-
 ## 🤝 Contributing
 
 プルリクエストやIssueは大歓迎です！
@@ -213,3 +220,11 @@ MIT License - feel free to use this structure for your own presentations!
 ---
 
 **💡 このリポジトリは、技術プレゼンテーションの作成から公開まで完全自動化されたワークフローを提供します。Slidevの美しいプレゼンテーション機能とVercelの高速デプロイを組み合わせ、開発者が内容作成に集中できる環境を実現しています。**
+
+## 📖 Presentations
+
+### 🎯 [SRE NEXT 2025 - NoCスタッフをやった話](/sre-next-2025/)
+SRE NEXT2025でNoCスタッフをやった話とSRE NEXTの講演紹介
+
+### ⚙️ [Slidev複数プレゼンテーション - 自動デプロイシステム](/slidev-system/)
+GitHub + Vercel で実現する完全自動化されたCI/CDワークフローの解説
