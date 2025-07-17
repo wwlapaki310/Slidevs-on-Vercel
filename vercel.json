@@ -6,11 +6,6 @@
   "regions": ["hnd1"],
   "cleanUrls": true,
   "trailingSlash": false,
-  "functions": {
-    "app/**/*.js": {
-      "runtime": "nodejs20.x"
-    }
-  },
   "rewrites": [
     {
       "source": "/sre-next-2025/(.*)",
@@ -19,10 +14,6 @@
     {
       "source": "/slidev-system/(.*)",
       "destination": "/slidev-system/$1"
-    },
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
     },
     {
       "source": "/(.*)",
