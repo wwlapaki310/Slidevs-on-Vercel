@@ -21,8 +21,38 @@ const presentations = [
   // 新しいプレゼンテーション追加時はここに追加
 ];
 
+// ファイル構造をデバッグするための関数
+const debugFileStructure = (dir, prefix = '') => {
+  try {
+    if (!fs.existsSync(dir)) {
+      console.log(`❌ Directory does not exist: ${dir}`);
+      return;
+    }
+    
+    const items = fs.readdirSync(dir);
+    console.log(`📁 ${prefix}${path.basename(dir)}/`);
+    
+    items.forEach(item => {
+      const itemPath = path.join(dir, item);
+      const stat = fs.statSync(itemPath);
+      
+      if (stat.isDirectory()) {
+        debugFileStructure(itemPath, prefix + '  ');
+      } else {
+        console.log(`📄 ${prefix}  ${item} (${stat.size} bytes)`);
+      }
+    });
+  } catch (error) {
+    console.log(`❌ Error reading directory ${dir}:`, error.message);
+  }
+};
+
 const generateIndexPage = () => {
   console.log('🚀 Building index page...');
+  
+  // デバッグ: ビルド後のディレクトリ構造を確認
+  console.log('\n🔍 Checking dist directory structure:');
+  debugFileStructure('dist');
   
   const indexHtml = `<!DOCTYPE html>
 <html lang="ja">
@@ -80,6 +110,17 @@ const generateIndexPage = () => {
       font-size: 1.2rem;
       color: #666;
       margin-bottom: 2rem;
+    }
+    
+    .debug-info {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+      color: #495057;
     }
     
     .stats {
@@ -284,6 +325,14 @@ const generateIndexPage = () => {
     <header>
       <h1>📊 My Slidev Presentations</h1>
       <p class="subtitle">技術プレゼンテーション集 - Powered by Slidev & Vercel</p>
+      
+      <div class="debug-info">
+        <strong>🔍 Debug Info:</strong><br>
+        Build Time: ${new Date().toISOString()}<br>
+        Presentations: ${presentations.length}<br>
+        Expected Paths: ${presentations.map(p => p.path).join(', ')}
+      </div>
+      
       <div class="stats">
         <div class="stat">
           <div class="stat-number">${presentations.length}</div>
@@ -344,10 +393,7 @@ const generateIndexPage = () => {
     console.log(`📊 Generated index for ${presentations.length} presentations`);
     
     // Create a simple robots.txt for SEO
-    const robotsTxt = `User-agent: *
-Allow: /
-
-Sitemap: https://your-domain.vercel.app/sitemap.xml`;
+    const robotsTxt = `User-agent: *\nAllow: /\n\nSitemap: https://your-domain.vercel.app/sitemap.xml`;
     fs.writeFileSync('dist/robots.txt', robotsTxt);
     
     console.log('🤖 robots.txt created');
@@ -371,6 +417,10 @@ Sitemap: https://your-domain.vercel.app/sitemap.xml`;
 </urlset>`;
     fs.writeFileSync('dist/sitemap.xml', sitemap);
     console.log('🗺️ sitemap.xml created');
+    
+    // 最終的なファイル構造を再度確認
+    console.log('\n📋 Final dist structure:');
+    debugFileStructure('dist');
     
   } catch (error) {
     console.error('❌ Build failed:', error);
