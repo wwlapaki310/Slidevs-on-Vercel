@@ -10,8 +10,5 @@ dist
 .temp
 .tmp
 
-# Temporarily ignore broken lockfile - let pnpm regenerate it
-pnpm-lock.yaml
-
 # Build artifacts
 *.log
