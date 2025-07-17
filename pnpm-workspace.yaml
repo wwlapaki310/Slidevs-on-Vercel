@@ -1,2 +1,1 @@
-packages:
-  - "*/src"
+# This file is intentionally empty to disable pnpm workspace temporarily
