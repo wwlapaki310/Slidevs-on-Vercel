@@ -1,230 +1,94 @@
 # My Slidev Presentations
 
-This repository contains multiple Slidev presentations with **automatic Vercel deployment** via CI/CD.
+📊 **SRE NEXT 2025 - NoCスタッフをやった話**
 
-## 🎯 特徴
+SRE NEXT2025でNoCスタッフをやった話とSRE NEXTの講演紹介
 
-- ✅ **複数プレゼンテーション対応**: フォルダ別に整理された構成
-- ✅ **自動デプロイ**: GitHub push → Vercel 自動更新
-- ✅ **美しいインデックス**: 全プレゼンテーションの一覧ページ
-- ✅ **SEO対応**: robots.txt、sitemap.xml自動生成
-- ✅ **レスポンシブ**: PC・スマートフォン対応
-- ✅ **高速**: Vercel CDNによるグローバル配信
+## 🚀 Live Demo
 
-## 📁 Structure
+**メインプレゼンテーション**: https://my-slidev-eight.vercel.app/
+
+### 利用可能なモード
+
+- **通常モード**: https://my-slidev-eight.vercel.app/
+- **発表者モード**: https://my-slidev-eight.vercel.app/presenter/
+- **概要モード**: https://my-slidev-eight.vercel.app/overview/
+- **PDF出力**: `npm run export`
+
+## 📁 プロジェクト構成
 
 ```
-.
-├── SRE-NEXT-2025/          # SRE NEXT 2025 presentation
-│   └── slides.md            # Main slides content
-├── SLIDEV-SYSTEM/           # System overview presentation
-│   └── slides.md            # This repository explanation
-├── scripts/
-│   └── build-index.js       # Script to build index page
-├── package.json             # Dependencies and build scripts
-├── vercel.json              # Vercel configuration
+my-slidev-presentations/
+├── SRE-NEXT-2025/
+│   └── slides.md          # メインスライド
+├── package.json
+├── vercel.json            # Vercel設定（公式推奨）
 └── README.md
 ```
 
-## 🚀 Getting Started
+## 🛠️ 開発
 
-### Prerequisites
-- Node.js >= 20.0
-- npm >= 10.0
-
-### Installation
+### ローカル開発
 
 ```bash
-# Clone the repository
-git clone https://github.com/wwlapaki310/my-slidev-presentations.git
-cd my-slidev-presentations
-
-# Install dependencies
+# 依存関係をインストール
 npm install
-```
 
-### Development
-
-```bash
-# Start development server for SRE NEXT presentation
+# 開発サーバーを起動
 npm run dev
-
-# Start development server for system overview
-npm run dev:system
-
-# Or directly specify the presentation
-npx slidev SRE-NEXT-2025/slides.md
-npx slidev SLIDEV-SYSTEM/slides.md
 ```
 
-### Building
+### ビルド
 
 ```bash
-# Build all presentations
+# 本番用ビルド
 npm run build
 
-# Preview the built site
+# ローカルプレビュー
 npm run preview
 ```
 
-## 🌐 Deployment
+### PDF出力
 
-### **🔥 Quick Deploy to Vercel (Recommended)**
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/wwlapaki310/my-slidev-presentations)
-
-**または手動セットアップ:**
-
-1. Vercelアカウントでこのリポジトリをインポート
-2. `git push`するだけで自動デプロイ！
-
-### デプロイフロー
-```
-git push → GitHub → Vercel Webhook → 自動ビルド → 本番反映 🎉
-```
-
-## 📊 Available Presentations
-
-| タイトル | 説明 | URL | ステータス |
-|---------|------|-----|---------|
-| **SRE NEXT 2025** | NoCスタッフをやった話 & 講演紹介 | `/sre-next-2025/` | ✅ 公開中 |
-| **Slidev System** | 自動デプロイシステムの解説 | `/slidev-system/` | ✅ 公開中 |
-
-## 🔧 Adding New Presentations
-
-### Step 1: プレゼンテーション作成
 ```bash
-# 新しいフォルダを作成
-mkdir MY-NEW-TALK
-
-# スライドファイルを作成
-cat > MY-NEW-TALK/slides.md << 'EOF'
----
-theme: default
-title: My New Talk
----
-
-# My New Talk
-## Subtitle
-
----
-
-# Content
-- Point 1
-- Point 2
-EOF
+npm run export
 ```
 
-### Step 2: ビルドスクリプト更新
+## 🌐 デプロイ
+
+Vercelに自動デプロイされます。
+
+### Vercel設定
+
+公式ドキュメント推奨の最小設定：
+
 ```json
-// package.json の scripts セクションに追加
 {
-  "build:all": "npm run build:sre-next && npm run build:slidev-system && npm run build:new-talk",
-  "build:new-talk": "slidev build MY-NEW-TALK/slides.md --out dist/my-new-talk --base /my-new-talk/"
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
 ```
 
-### Step 3: インデックス更新
-```javascript
-// scripts/build-index.js の presentations 配列に追加
-{
-  title: 'My New Talk',
-  description: 'Description of my new presentation',
-  path: '/my-new-talk/',
-  folder: 'MY-NEW-TALK',
-  lastUpdated: '2025-07-17',
-  tags: ['技術', 'プレゼン']
-}
-```
+## 📝 スライド編集
 
-### Step 4: Vercel設定更新
-```json
-// vercel.json の rewrites に追加
-{
-  "source": "/my-new-talk/(.*)",
-  "destination": "/my-new-talk/$1"
-}
-```
+`SRE-NEXT-2025/slides.md`を編集してください。
 
-### Step 5: デプロイ
-```bash
-git add .
-git commit -m "Add new presentation: My New Talk"
-git push origin main
-# 🎊 数分後に自動的に本番サイトに反映！
-```
+Slidevの詳細な使い方は[公式ドキュメント](https://ja.sli.dev/)を参照してください。
 
-## 🛠️ Technical Details
+## 🔧 技術スタック
 
-### Slidev Configuration
-- **Theme**: Default theme with custom styling
-- **Features**: Code highlighting, transitions, interactive elements
-- **Export**: PDF export available for each presentation
+- **Slidev**: スライド作成フレームワーク
+- **Vue.js**: フロントエンドフレームワーク  
+- **Vercel**: ホスティングプラットフォーム
+- **Markdown**: スライド記述言語
 
-### Vercel Configuration
-- **Build Command**: `npm run build`
-- **Output Directory**: `dist`
-- **Node.js**: v20.x
-- **Regions**: Tokyo (nrt1) for fast access from Japan
+## 📚 参考リンク
 
-### CI/CD Pipeline
-```mermaid
-graph LR
-    A[git push] --> B[GitHub]
-    B --> C[Vercel Webhook]
-    C --> D[Auto Build]
-    D --> E[Deploy]
-    E --> F[🎉 Live Site]
-```
-
-## 📈 Performance & SEO
-
-- **Lighthouse Score**: 95+ (Performance, Accessibility, SEO)
-- **Core Web Vitals**: Optimized for all metrics
-- **CDN**: Global distribution via Vercel Edge Network
-- **Caching**: Optimized static asset caching
-- **Compression**: Automatic Brotli/Gzip compression
-
-## 🔍 Monitoring
-
-### Vercel Dashboard で確認できる情報
-- ✅ デプロイ履歴
-- ✅ ビルドログ
-- ✅ パフォーマンス指標
-- ✅ アクセス解析
-- ✅ エラーログ
-
-### 通知設定
-- GitHub Status Checks
-- Slack/Discord通知
-- メール通知
-
-## 🤝 Contributing
-
-プルリクエストやIssueは大歓迎です！
-
-### 改善提案
-- 新しいテーマの追加
-- ビルドスクリプトの最適化
-- ドキュメントの改善
-- CI/CDフローの強化
-
-## 📝 License
-
-MIT License - feel free to use this structure for your own presentations!
-
-## 🏷️ Tags
-
-`#slidev` `#presentations` `#vercel` `#cicd` `#automation` `#sre` `#tech-talks`
+- [Slidev公式ドキュメント](https://ja.sli.dev/)
+- [Slidev GitHub](https://github.com/slidevjs/slidev)
+- [Vercel](https://vercel.com/)
 
 ---
 
-**💡 このリポジトリは、技術プレゼンテーションの作成から公開まで完全自動化されたワークフローを提供します。Slidevの美しいプレゼンテーション機能とVercelの高速デプロイを組み合わせ、開発者が内容作成に集中できる環境を実現しています。**
-
-## 📖 Presentations
-
-### 🎯 [SRE NEXT 2025 - NoCスタッフをやった話](/sre-next-2025/)
-SRE NEXT2025でNoCスタッフをやった話とSRE NEXTの講演紹介
-
-### ⚙️ [Slidev複数プレゼンテーション - 自動デプロイシステム](/slidev-system/)
-GitHub + Vercel で実現する完全自動化されたCI/CDワークフローの解説
+**Built with ❤️ using Slidev**
