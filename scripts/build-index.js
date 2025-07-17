@@ -9,6 +9,14 @@ const presentations = [
     folder: 'SRE-NEXT-2025',
     lastUpdated: '2025-07-16',
     tags: ['SRE', 'NoC', 'インフラ', '運用']
+  },
+  {
+    title: 'Slidev複数プレゼンテーション - 自動デプロイシステム',
+    description: 'GitHub + Vercel で実現する完全自動化されたCI/CDワークフローの解説',
+    path: '/slidev-system/',
+    folder: 'SLIDEV-SYSTEM',
+    lastUpdated: '2025-07-17',
+    tags: ['Slidev', 'CI/CD', 'Vercel', 'GitHub', '自動化']
   }
   // 新しいプレゼンテーション追加時はここに追加
 ];
@@ -23,7 +31,7 @@ const generateIndexPage = () => {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Slidev Presentations</title>
   <meta name="description" content="Slidevで作成された技術プレゼンテーション集">
-  <meta name="keywords" content="Slidev, プレゼンテーション, 技術, SRE, 開発">
+  <meta name="keywords" content="Slidev, プレゼンテーション, 技術, SRE, 開発, CI/CD, 自動化">
   <meta property="og:title" content="My Slidev Presentations">
   <meta property="og:description" content="Slidevで作成された技術プレゼンテーション集">
   <meta property="og:type" content="website">
@@ -275,7 +283,7 @@ const generateIndexPage = () => {
   <div class="container">
     <header>
       <h1>📊 My Slidev Presentations</h1>
-      <p class="subtitle">技術プレゼンテーション集 - Powered by Slidev</p>
+      <p class="subtitle">技術プレゼンテーション集 - Powered by Slidev & Vercel</p>
       <div class="stats">
         <div class="stat">
           <div class="stat-number">${presentations.length}</div>
