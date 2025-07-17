@@ -3,7 +3,7 @@
   "outputDirectory": "dist",
   "installCommand": "npm ci",
   "framework": null,
-  "regions": ["nrt1"],
+  "regions": ["hnd1"],
   "cleanUrls": true,
   "trailingSlash": false,
   "functions": {
