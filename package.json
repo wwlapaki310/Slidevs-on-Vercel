@@ -6,9 +6,8 @@
   "scripts": {
     "dev": "slidev --open SRE-NEXT-2025/slides.md",
     "dev:system": "slidev --open SLIDEV-SYSTEM/slides.md",
-    "build": "npm run clean && npm run build:all && npm run build:index",
+    "build": "npm run clean && npm run build:sre-next && npm run build:slidev-system && npm run build:index",
     "clean": "rm -rf dist",
-    "build:all": "npm run build:sre-next && npm run build:slidev-system",
     "build:sre-next": "slidev build SRE-NEXT-2025/slides.md --out dist/sre-next-2025 --base /sre-next-2025/",
     "build:slidev-system": "slidev build SLIDEV-SYSTEM/slides.md --out dist/slidev-system --base /slidev-system/",
     "build:index": "node scripts/build-index.js",
