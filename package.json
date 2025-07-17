@@ -3,9 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "slidev build --base /sre-next-2025/ --out dist/sre-next-2025 && node scripts/build-index.js",
-    "dev": "slidev --open",
-    "export": "slidev export"
+    "build": "pnpm run -r build && node scripts/build-index.js"
   },
   "dependencies": {
     "@slidev/cli": "^0.52.8",
