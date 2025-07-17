@@ -8,12 +8,32 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/sre-next-2025",
+      "destination": "/sre-next-2025/index.html"
+    },
+    {
       "source": "/sre-next-2025/(.*)",
       "destination": "/sre-next-2025/index.html"
     },
     {
+      "source": "/slidev-system",
+      "destination": "/slidev-system/index.html"
+    },
+    {
       "source": "/slidev-system/(.*)",
       "destination": "/slidev-system/index.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/sre-next-2025/",
+      "destination": "/sre-next-2025",
+      "permanent": false
+    },
+    {
+      "source": "/slidev-system/",
+      "destination": "/slidev-system",
+      "permanent": false
     }
   ],
   "headers": [
