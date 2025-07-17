@@ -6,8 +6,8 @@ const presentations = [
     title: 'SRE NEXT 2025 - NoCスタッフをやった話',
     description: 'SRE NEXT2025でNoCスタッフをやった話とSRE NEXTの講演紹介',
     path: '/sre-next-2025/',
-    folder: 'SRE-NEXT-2025',
-    lastUpdated: '2025-07-16',
+    folder: 'sre-next-2025',  // 新しいディレクトリ構造に対応
+    lastUpdated: '2025-07-17',
     tags: ['SRE', 'NoC', 'インフラ', '運用']
   }
 ];
@@ -39,7 +39,7 @@ const debugFileStructure = (dir, prefix = '') => {
 };
 
 const generateIndexPage = () => {
-  console.log('🚀 Building index page...');
+  console.log('🚀 Building index page for workspace structure...');
   console.log(`🎯 Testing with ${presentations.length} presentation(s)`);
   
   // 現在のワーキングディレクトリを確認
@@ -49,6 +49,18 @@ const generateIndexPage = () => {
   const distPath = path.resolve(process.cwd(), 'dist');
   console.log(`📍 Absolute dist path: ${distPath}`);
   console.log(`📍 Dist exists: ${fs.existsSync(distPath)}`);
+  
+  // ワークスペース構造での確認
+  console.log('\n🔍 Checking workspace structure:');
+  const workspaceStructure = ['sre-next-2025', 'sre-next-2025/src'];
+  workspaceStructure.forEach(wsPath => {
+    if (fs.existsSync(wsPath)) {
+      console.log(`✅ Found workspace: ${wsPath}`);
+      debugFileStructure(wsPath, '  ');
+    } else {
+      console.log(`❌ Missing workspace: ${wsPath}`);
+    }
+  });
   
   // ルートディレクトリの内容を確認
   console.log('\n🔍 Root directory contents:');
@@ -414,16 +426,17 @@ const generateIndexPage = () => {
       <p class="subtitle">技術プレゼンテーション集 - Powered by Slidev & Vercel</p>
       
       <div class="debug-info">
-        <strong>🔍 Enhanced Debug Mode:</strong><br>
+        <strong>🔍 Phase 2 Debug Mode:</strong><br>
         Build Time: ${new Date().toISOString()}<br>
         Working Dir: ${process.cwd()}<br>
+        Workspace Structure: ✅ pnpm workspace<br>
         Presentations Expected: ${presentations.length}<br>
         ${presentations.map(p => {
           const exists = fs.existsSync(`dist${p.path}index.html`);
           return `<span class="status-indicator ${exists ? 'status-ok' : 'status-error'}"></span>${p.path} ${exists ? '✅' : '❌'}`;
         }).join('<br>')}<br>
         <br>
-        <strong>🔧 Enhanced debugging to locate Slidev output</strong>
+        <strong>🔧 Workspace-based build system active</strong>
       </div>
       
       <div class="stats">
@@ -477,11 +490,11 @@ const generateIndexPage = () => {
   try {
     // Write index.html
     fs.writeFileSync('dist/index.html', indexHtml);
-    console.log('✅ Index page built successfully!');
+    console.log('✅ Index page built successfully for workspace structure!');
     console.log(`📊 Generated index for ${presentations.length} presentation(s)`);
     
     // Create a simple robots.txt for SEO
-    const robotsTxt = `User-agent: *\nAllow: /\n\nSitemap: https://your-domain.vercel.app/sitemap.xml`;
+    const robotsTxt = `User-agent: *\nAllow: /\n\nSitemap: https://my-slidev-eight.vercel.app/sitemap.xml`;
     fs.writeFileSync('dist/robots.txt', robotsTxt);
     
     console.log('🤖 robots.txt created');
@@ -490,14 +503,14 @@ const generateIndexPage = () => {
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://your-domain.vercel.app/</loc>
+    <loc>https://my-slidev-eight.vercel.app/</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   ${presentations.map(p => `
   <url>
-    <loc>https://your-domain.vercel.app${p.path}</loc>
+    <loc>https://my-slidev-eight.vercel.app${p.path}</loc>
     <lastmod>${p.lastUpdated}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -519,7 +532,7 @@ const generateIndexPage = () => {
 // エラーハンドリング付きで実行
 try {
   generateIndexPage();
-  console.log('🎉 Build completed successfully');
+  console.log('🎉 Phase 2 workspace build completed successfully');
 } catch (error) {
   console.error('💥 Fatal error during build:', error);
   process.exit(1);
