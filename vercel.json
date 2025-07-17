@@ -1,56 +1,5 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install",
-  "framework": null,
-  "regions": ["hnd1"],
-  "cleanUrls": true,
-  "trailingSlash": false,
   "rewrites": [
-    {
-      "source": "/sre-next-2025/(.*)",
-      "destination": "/sre-next-2025/index.html"
-    },
-    {
-      "source": "/slidev-system/(.*)",
-      "destination": "/slidev-system/index.html"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Frame-Options",
-          "value": "SAMEORIGIN"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        }
-      ]
-    },
-    {
-      "source": "/sre-next-2025/**",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        }
-      ]
-    },
-    {
-      "source": "/slidev-system/**",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        }
-      ]
-    }
-  ],
-  "github": {
-    "deploymentStatus": true,
-    "deploymentChecks": true
-  }
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
