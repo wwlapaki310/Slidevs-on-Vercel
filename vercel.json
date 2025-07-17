@@ -8,32 +8,12 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/sre-next-2025",
-      "destination": "/sre-next-2025/index.html"
-    },
-    {
       "source": "/sre-next-2025/(.*)",
       "destination": "/sre-next-2025/index.html"
     },
     {
-      "source": "/slidev-system",
-      "destination": "/slidev-system/index.html"
-    },
-    {
       "source": "/slidev-system/(.*)",
       "destination": "/slidev-system/index.html"
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/sre-next-2025/",
-      "destination": "/sre-next-2025",
-      "permanent": false
-    },
-    {
-      "source": "/slidev-system/",
-      "destination": "/slidev-system",
-      "permanent": false
     }
   ],
   "headers": [
@@ -47,19 +27,6 @@
         {
           "key": "X-Content-Type-Options",
           "value": "nosniff"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/index.html",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
         }
       ]
     },
