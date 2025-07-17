@@ -1,5 +1,12 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { 
+      "source": "/sre-next-2025/(.*)", 
+      "destination": "/sre-next-2025/index.html" 
+    },
+    { 
+      "source": "/", 
+      "destination": "/index.html" 
+    }
   ]
 }
