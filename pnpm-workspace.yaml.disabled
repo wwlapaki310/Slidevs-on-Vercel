@@ -1,7 +1,0 @@
-# Temporary file to be restored in Stage 2
-# This file has been temporarily removed to fix the /sre-next-2025/ 404 issue
-# It will be restored when we implement the full workspace structure
-
-# Original content:
-# packages:
-#   - "*/src"
