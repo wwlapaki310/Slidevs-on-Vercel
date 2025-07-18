@@ -44,21 +44,21 @@ graph LR
     B --> C[npm install]
     C --> D[npm run build]
     
-    D --> E1[slides/sre-next-2025/src をビルド]
-    D --> E2[slides/slidev-system/src をビルド]
-    D --> E3[scripts/build-index.js 実行]
+    D --> E1[Build SRE Slides]
+    D --> E2[Build System Slides]
+    D --> E3[Generate Index]
     
-    E1 --> F1[/sre-next-2025/ に配置]
-    E2 --> F2[/slidev-system/ に配置]
-    E3 --> F3[/ にランディングページ配置]
+    E1 --> F1[Deploy to /sre-next-2025/]
+    E2 --> F2[Deploy to /slidev-system/]
+    E3 --> F3[Deploy to /]
     
-    F1 --> G[Vercel CDN配信]
+    F1 --> G[Vercel CDN]
     F2 --> G
     F3 --> G
     
-    G --> H1[https://my-slidev-eight.vercel.app/sre-next-2025/]
-    G --> H2[https://my-slidev-eight.vercel.app/slidev-system/]
-    G --> H3[https://my-slidev-eight.vercel.app/]
+    G --> H1[Live: /sre-next-2025/]
+    G --> H2[Live: /slidev-system/]
+    G --> H3[Live: Landing Page]
     
     style A fill:#e1f5fe
     style B fill:#fff3e0
