@@ -9,8 +9,7 @@ const slides = [
     description: 'SRE NEXT 2025でNoCスタッフをやった話とSRE NEXTの講演紹介',
     date: '2025-07-17',
     author: 'Satoru Akita',
-    tags: ['SRE', 'NoC', 'Infrastructure', 'Conference'],
-    thumbnail: '/sre-next-2025/assets/screenshot.png' // TODO: スクリーンショット追加
+    tags: ['SRE', 'NoC', 'Infrastructure', 'Conference']
   },
   {
     name: 'slidev-system',
@@ -18,8 +17,7 @@ const slides = [
     description: '1つのリポジトリで複数のSlidevプレゼンテーションを効率的に管理する仕組みの解説',
     date: '2025-07-18',
     author: 'Satoru Akita',
-    tags: ['Slidev', 'Vercel', 'DevOps', 'Automation'],
-    thumbnail: '/slidev-system/assets/screenshot.png' // TODO: スクリーンショット追加
+    tags: ['Slidev', 'Vercel', 'DevOps', 'Automation']
   }
 ];
 
@@ -32,7 +30,6 @@ const htmlTemplate = `<!DOCTYPE html>
     <title>My Slidev Presentations</title>
     <meta name="description" content="複数のSlidevプレゼンテーションを1つのリポジトリで管理するシステム">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎪%3C/text%3E%3C/svg%3E">
     <style>
         .slide-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -43,10 +40,6 @@ const htmlTemplate = `<!DOCTYPE html>
         }
         .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .tag {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
         }
     </style>
 </head>
@@ -61,7 +54,7 @@ const htmlTemplate = `<!DOCTYPE html>
                 <p class="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto">
                     複数のSlidevプレゼンテーションを1つのリポジトリで管理するシステム
                 </p>
-                <div class="mt-6 flex justify-center gap-4">
+                <div class="mt-6">
                     <a href="https://github.com/wwlapaki310/my-slidev-presentations" 
                        class="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center gap-2"
                        target="_blank">
