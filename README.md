@@ -16,7 +16,7 @@
   - **発表者モード**: https://my-slidev-eight.vercel.app/slidev-system/presenter/
   - **概要モード**: https://my-slidev-eight.vercel.app/slidev-system/overview/
 
-## 📁 プロジェクト構成（Phase 5 - slides/ ディレクトリ構造）
+## 📁 プロジェクト構成
 
 ```
 my-slidev-presentations/
@@ -31,13 +31,38 @@ my-slidev-presentations/
 │       └── src/
 │           ├── slides.md      # スライド内容
 │           └── package.json   # 個別設定
-├── dist/                      # ビルド成果物
-│   ├── index.html             # インデックスページ
-│   ├── sre-next-2025/         # ビルドされたスライド
-│   └── slidev-system/         # ビルドされたスライド
 ├── scripts/
 │   └── build-index.js         # インデックス生成
 └── vercel.json                # Vercel設定
+```
+
+## 🔄 デプロイフロー
+
+```mermaid
+graph LR
+    A[GitHub Push] --> B[Vercel Auto Deploy]
+    B --> C[npm install]
+    C --> D[npm run build]
+    
+    D --> E1[slides/sre-next-2025/src をビルド]
+    D --> E2[slides/slidev-system/src をビルド]
+    D --> E3[scripts/build-index.js 実行]
+    
+    E1 --> F1[/sre-next-2025/ に配置]
+    E2 --> F2[/slidev-system/ に配置]
+    E3 --> F3[/ にランディングページ配置]
+    
+    F1 --> G[Vercel CDN配信]
+    F2 --> G
+    F3 --> G
+    
+    G --> H1[https://my-slidev-eight.vercel.app/sre-next-2025/]
+    G --> H2[https://my-slidev-eight.vercel.app/slidev-system/]
+    G --> H3[https://my-slidev-eight.vercel.app/]
+    
+    style A fill:#e1f5fe
+    style B fill:#fff3e0
+    style G fill:#c8e6c9
 ```
 
 ## 🛠️ 開発
@@ -50,7 +75,7 @@ npm run dev:sre-next-2025
 npm run dev:slidev-system
 ```
 
-### ビルド
+### ローカルビルド（確認用）
 
 ```bash
 # 全プレゼンテーションをビルド
@@ -61,12 +86,18 @@ npm run build:sre-next-2025
 npm run build:slidev-system
 ```
 
-## 🌐 デプロイ
+> **Note**: 実際のデプロイは Vercel 上で自動実行されるため、ローカルでの `dist/` ディレクトリ生成は確認用途のみです。
 
-Vercelに自動デプロイされます。複数スライド対応のルーティング設定：
+## 🌐 Vercel設定
+
+### 自動デプロイ設定
+
+`vercel.json` でビルドとルーティングを設定：
 
 ```json
 {
+  "installCommand": "npm install",
+  "buildCommand": "npm run build",
   "rewrites": [
     { 
       "source": "/sre-next-2025/(.*)", 
@@ -83,6 +114,12 @@ Vercelに自動デプロイされます。複数スライド対応のルーテ�
   ]
 }
 ```
+
+### デプロイトリガー
+
+- **main ブランチへのプッシュ**: 自動的に本番デプロイ
+- **feature ブランチへのプッシュ**: プレビューデプロイ
+- **Pull Request**: プレビューURL自動生成
 
 ## 📝 現在のプレゼンテーション
 
@@ -103,32 +140,20 @@ Vercelに自動デプロイされます。複数スライド対応のルーテ�
 - **Slidev**: スライド作成フレームワーク
 - **pnpm workspace**: モノレポ管理
 - **Vue.js**: フロントエンドフレームワーク  
-- **Vercel**: ホスティングプラットフォーム
+- **Vercel**: ホスティング + CI/CD プラットフォーム
 - **Markdown**: スライド記述言語
-
-## 📈 開発ロードマップ
-
-- ✅ **Phase 1**: 基盤安定化（単一スライド）
-- ✅ **Phase 2**: ワークスペース構成への移行
-- ✅ **Phase 3**: 2つ目のスライド追加
-- ✅ **Phase 4**: インデックスページと完成
-- ✅ **Phase 5**: slides/ ディレクトリ構造への移行
 
 ## 🆕 新しいプレゼンテーション追加方法
 
-1. 新しいディレクトリを作成: `slides/{presentation-name}/src/`
-2. `slides/{presentation-name}/src/package.json` と `slides.md` を作成
-3. ルート `package.json` にビルドスクリプトを追加
-4. `scripts/build-index.js` にプレゼンテーション情報を追加
-5. `vercel.json` にルーティング設定を追加
-
-### 新規スライド追加のテンプレート
+### Step 1: ディレクトリ作成
 
 ```bash
-# ディレクトリ作成
 mkdir -p slides/{presentation-name}/src
+```
 
-# package.json のテンプレート
+### Step 2: package.json 作成
+
+```bash
 cat > slides/{presentation-name}/src/package.json << 'EOF'
 {
   "name": "{presentation-name}",
@@ -149,6 +174,62 @@ cat > slides/{presentation-name}/src/package.json << 'EOF'
   }
 }
 EOF
+```
+
+### Step 3: slides.md 作成
+
+```bash
+cat > slides/{presentation-name}/src/slides.md << 'EOF'
+---
+theme: default
+highlighter: shiki
+lineNumbers: false
+transition: slide-left
+title: Your Presentation Title
+---
+
+# Your First Slide
+
+Content goes here...
+
+---
+
+# Second Slide
+
+More content...
+EOF
+```
+
+### Step 4: ルート設定更新
+
+1. **package.json** にビルドスクリプト追加:
+```json
+{
+  "scripts": {
+    "dev:{presentation-name}": "cd slides/{presentation-name}/src && npm run dev",
+    "build:{presentation-name}": "cd slides/{presentation-name}/src && npm install && npm run build"
+  }
+}
+```
+
+2. **vercel.json** にルーティング追加:
+```json
+{
+  "rewrites": [
+    { 
+      "source": "/{presentation-name}/(.*)", 
+      "destination": "/{presentation-name}/index.html" 
+    }
+  ]
+}
+```
+
+3. **scripts/build-index.js** にプレゼンテーション情報を追加
+
+### Step 5: 開発開始
+
+```bash
+npm run dev:{presentation-name}
 ```
 
 ## 📚 参考リンク
