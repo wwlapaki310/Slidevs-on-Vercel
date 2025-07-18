@@ -8,6 +8,7 @@
     "build:sre-next-2025": "cd sre-next-2025/src && npm install && npm run build",
     "build:slidev-system": "cd slidev-system/src && npm install && npm run build",
     "build:index": "node scripts/build-index.js",
+    "create-slide": "node scripts/create-slide.js",
     "dev:sre-next-2025": "cd sre-next-2025/src && npm run dev",
     "dev:slidev-system": "cd slidev-system/src && npm run dev"
   },
