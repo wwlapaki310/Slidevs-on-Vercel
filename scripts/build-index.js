@@ -1,485 +1,239 @@
 import fs from 'fs';
 import path from 'path';
 
-const presentations = [
+// スライド情報の設定
+const slides = [
   {
-    title: 'SRE NEXT 2025 - NoCスタッフをやった話',
-    description: 'SRE NEXT2025でNoCスタッフをやった話とSRE NEXTの講演紹介',
-    path: '/sre-next-2025/',
-    folder: 'sre-next-2025',
-    lastUpdated: '2025-07-17',
-    tags: ['SRE', 'NoC', 'インフラ', '運用']
+    name: 'sre-next-2025',
+    title: 'SRE NEXT 2025 - NoCスタッフ体験記',
+    description: 'SRE NEXT 2025でNoCスタッフをやった話とSRE NEXTの講演紹介',
+    date: '2025-07-17',
+    author: 'Satoru Akita',
+    tags: ['SRE', 'NoC', 'Infrastructure', 'Conference'],
+    thumbnail: '/sre-next-2025/assets/screenshot.png' // TODO: スクリーンショット追加
+  },
+  {
+    name: 'slidev-system',
+    title: 'Slidev × Vercel 複数スライド管理システム',
+    description: '1つのリポジトリで複数のSlidevプレゼンテーションを効率的に管理する仕組みの解説',
+    date: '2025-07-18',
+    author: 'Satoru Akita',
+    tags: ['Slidev', 'Vercel', 'DevOps', 'Automation'],
+    thumbnail: '/slidev-system/assets/screenshot.png' // TODO: スクリーンショット追加
   }
 ];
 
-// ファイル構造をデバッグするための関数
-const debugFileStructure = (dir, prefix = '') => {
-  try {
-    if (!fs.existsSync(dir)) {
-      console.log(`❌ Directory does not exist: ${dir}`);
-      return;
-    }
-    
-    const items = fs.readdirSync(dir);
-    console.log(`📁 ${prefix}${path.basename(dir)}/`);
-    
-    items.forEach(item => {
-      const itemPath = path.join(dir, item);
-      const stat = fs.statSync(itemPath);
-      
-      if (stat.isDirectory()) {
-        debugFileStructure(itemPath, prefix + '  ');
-      } else {
-        console.log(`📄 ${prefix}  ${item} (${stat.size} bytes)`);
-      }
-    });
-  } catch (error) {
-    console.log(`❌ Error reading directory ${dir}:`, error.message);
-  }
-};
-
-const generateIndexPage = () => {
-  console.log('🔧 Building index page - Fixed workspace structure');
-  console.log(`🎯 Building for ${presentations.length} presentation(s)`);
-  
-  // 現在のワーキングディレクトリを確認
-  console.log(`📍 Working directory: ${process.cwd()}`);
-  
-  // distディレクトリの確認
-  if (!fs.existsSync('dist')) {
-    console.log('📁 Creating dist directory...');
-    fs.mkdirSync('dist', { recursive: true });
-  } else {
-    console.log('📁 Dist directory already exists - preserving Slidev output');
-  }
-  
-  // 現在のファイル構造を確認
-  console.log('\n🔍 Current workspace structure:');
-  debugFileStructure('.');
-  
-  // dist構造の確認
-  console.log('\n🔍 Current dist structure:');
-  debugFileStructure('dist');
-  
-  // 既存のSlidevプレゼンテーションをチェック
-  console.log('\n🔍 Checking for Slidev presentations:');
-  presentations.forEach(p => {
-    const presentationDir = `dist${p.path}`;
-    const indexFile = path.join(presentationDir, 'index.html');
-    
-    if (fs.existsSync(presentationDir)) {
-      console.log(`✅ Found: ${p.path}`);
-      if (fs.existsSync(indexFile)) {
-        const stats = fs.statSync(indexFile);
-        console.log(`   📄 index.html (${stats.size} bytes)`);
-      } else {
-        console.log(`   ❌ index.html not found`);
-      }
-      
-      // ディレクトリ内容を表示
-      debugFileStructure(presentationDir, '     ');
-    } else {
-      console.log(`❌ Missing: ${p.path}`);
-    }
-  });
-  
-  const indexHtml = `<!DOCTYPE html>
+// HTMLテンプレート
+const htmlTemplate = `<!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Slidev Presentations</title>
-  <meta name="description" content="Slidevで作成された技術プレゼンテーション集">
-  <meta name="keywords" content="Slidev, プレゼンテーション, 技術, SRE, 開発, CI/CD, 自動化">
-  <meta property="og:title" content="My Slidev Presentations">
-  <meta property="og:description" content="Slidevで作成された技術プレゼンテーション集">
-  <meta property="og:type" content="website">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
-      line-height: 1.6;
-      color: #333;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      padding: 2rem 1rem;
-    }
-    
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 16px;
-      padding: 3rem;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-    }
-    
-    header {
-      text-align: center;
-      margin-bottom: 3rem;
-    }
-    
-    h1 {
-      font-size: 3rem;
-      color: #2c3e50;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .subtitle {
-      font-size: 1.2rem;
-      color: #666;
-      margin-bottom: 2rem;
-    }
-    
-    .debug-info {
-      background: #f8f9fa;
-      border: 1px solid #e9ecef;
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 2rem;
-      font-family: monospace;
-      font-size: 0.9rem;
-      color: #495057;
-    }
-    
-    .stats {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      margin-bottom: 2rem;
-    }
-    
-    .stat {
-      text-align: center;
-    }
-    
-    .stat-number {
-      font-size: 2rem;
-      font-weight: bold;
-      color: #667eea;
-    }
-    
-    .stat-label {
-      font-size: 0.9rem;
-      color: #666;
-    }
-    
-    .presentations {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-      gap: 2rem;
-      margin-bottom: 3rem;
-    }
-    
-    .presentation-card {
-      border: 1px solid #e1e8ed;
-      border-radius: 12px;
-      padding: 2rem;
-      background: #fafafa;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .presentation-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .presentation-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 25px rgba(0,0,0,0.15);
-      border-color: #667eea;
-    }
-    
-    .presentation-card h2 {
-      font-size: 1.5rem;
-      color: #2c3e50;
-      margin-bottom: 1rem;
-      line-height: 1.3;
-    }
-    
-    .description {
-      color: #666;
-      margin-bottom: 1.5rem;
-      line-height: 1.6;
-    }
-    
-    .meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-    }
-    
-    .date {
-      font-size: 0.9rem;
-      color: #888;
-    }
-    
-    .tags {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-    
-    .tag {
-      background: #667eea;
-      color: white;
-      padding: 0.25rem 0.75rem;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 500;
-    }
-    
-    .actions {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    
-    .btn {
-      padding: 0.75rem 1.5rem;
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: 500;
-      text-align: center;
-      transition: all 0.2s ease;
-      display: inline-block;
-      min-width: 160px;
-    }
-    
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-    }
-    
-    .btn-primary:hover {
-      transform: scale(1.05);
-      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-    }
-    
-    .btn-secondary {
-      background: #f8f9fa;
-      color: #667eea;
-      border: 2px solid #667eea;
-    }
-    
-    .btn-secondary:hover {
-      background: #667eea;
-      color: white;
-    }
-    
-    .status-indicator {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      margin-right: 0.5rem;
-    }
-    
-    .status-ok {
-      background-color: #28a745;
-    }
-    
-    .status-error {
-      background-color: #dc3545;
-    }
-    
-    footer {
-      text-align: center;
-      padding-top: 2rem;
-      border-top: 1px solid #e1e8ed;
-      color: #666;
-    }
-    
-    footer a {
-      color: #667eea;
-      text-decoration: none;
-      font-weight: 500;
-    }
-    
-    footer a:hover {
-      text-decoration: underline;
-    }
-    
-    .github-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-top: 1rem;
-      color: #667eea;
-      text-decoration: none;
-      font-weight: 500;
-    }
-    
-    .github-link:hover {
-      text-decoration: underline;
-    }
-    
-    @media (max-width: 768px) {
-      body {
-        padding: 1rem;
-      }
-      
-      .container {
-        padding: 2rem;
-      }
-      
-      h1 {
-        font-size: 2rem;
-      }
-      
-      .presentations {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-      }
-      
-      .stats {
-        flex-direction: column;
-        gap: 1rem;
-      }
-      
-      .actions {
-        flex-direction: column;
-      }
-      
-      .btn {
-        min-width: auto;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Slidev Presentations</title>
+    <meta name="description" content="複数のSlidevプレゼンテーションを1つのリポジトリで管理するシステム">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎪%3C/text%3E%3C/svg%3E">
+    <style>
+        .slide-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .slide-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .tag {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+    </style>
 </head>
-<body>
-  <div class="container">
-    <header>
-      <h1>📊 My Slidev Presentations</h1>
-      <p class="subtitle">技術プレゼンテーション集 - Powered by Slidev & Vercel</p>
-      
-      <div class="debug-info">
-        <strong>🔧 Fixed pnpm workspace build:</strong><br>
-        Build Time: ${new Date().toISOString()}<br>
-        Working Dir: ${process.cwd()}<br>
-        Build Command: pnpm run -r build && node scripts/build-index.js<br>
-        Presentations Expected: ${presentations.length}<br>
-        ${presentations.map(p => {
-          const exists = fs.existsSync(`dist${p.path}index.html`);
-          return `<span class="status-indicator ${exists ? 'status-ok' : 'status-error'}"></span>${p.path} ${exists ? '✅' : '❌'}`;
-        }).join('<br>')}<br>
-        <br>
-        <strong>🚀 Workspace-based build fixed</strong>
-      </div>
-      
-      <div class="stats">
-        <div class="stat">
-          <div class="stat-number">${presentations.length}</div>
-          <div class="stat-label">プレゼンテーション</div>
-        </div>
-        <div class="stat">
-          <div class="stat-number">${presentations.reduce((sum, p) => sum + p.tags.length, 0)}</div>
-          <div class="stat-label">トピック</div>
-        </div>
-        <div class="stat">
-          <div class="stat-number">${new Date().getFullYear()}</div>
-          <div class="stat-label">更新年</div>
-        </div>
-      </div>
-    </header>
-    
-    <main class="presentations">
-      ${presentations.map(p => `
-        <article class="presentation-card">
-          <h2>${p.title}</h2>
-          <p class="description">${p.description}</p>
-          <div class="meta">
-            <span class="date">更新: ${p.lastUpdated}</span>
-            <div class="tags">
-              ${p.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+<body class="bg-gray-50 min-h-screen">
+    <!-- ヘッダー -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4 py-8">
+            <div class="text-center">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                    🎪 My Slidev Presentations
+                </h1>
+                <p class="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto">
+                    複数のSlidevプレゼンテーションを1つのリポジトリで管理するシステム
+                </p>
+                <div class="mt-6 flex justify-center gap-4">
+                    <a href="https://github.com/wwlapaki310/my-slidev-presentations" 
+                       class="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center gap-2"
+                       target="_blank">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        GitHub Repository
+                    </a>
+                </div>
             </div>
-          </div>
-          <div class="actions">
-            <a href="${p.path}" class="btn btn-primary">プレゼンテーションを見る</a>
-            <a href="${p.path}presenter/" class="btn btn-secondary">発表者モード</a>
-          </div>
-        </article>
-      `).join('')}
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="max-w-6xl mx-auto px-4 py-12">
+        <!-- システム概要 -->
+        <section class="mb-12">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-3">
+                    <span class="text-2xl">🏗️</span>
+                    システム概要
+                </h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <div class="text-4xl mb-3">📊</div>
+                        <h3 class="font-semibold text-gray-800 mb-2">統一管理</h3>
+                        <p class="text-gray-600 text-sm">1つのリポジトリで複数プレゼンテーション管理</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl mb-3">🚀</div>
+                        <h3 class="font-semibold text-gray-800 mb-2">自動デプロイ</h3>
+                        <p class="text-gray-600 text-sm">Vercelでの一括デプロイメント</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl mb-3">🔄</div>
+                        <h3 class="font-semibold text-gray-800 mb-2">効率開発</h3>
+                        <p class="text-gray-600 text-sm">pnpm workspaceによる効率的管理</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- スライド一覧 -->
+        <section>
+            <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">
+                📚 Available Presentations
+            </h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                ${slides.map(slide => `
+                <div class="slide-card bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                    <!-- サムネイル エリア -->
+                    <div class="h-48 bg-gradient-to-br from-blue-400 to-purple-500 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-black bg-opacity-20"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-center text-white">
+                                <div class="text-6xl mb-2">🎯</div>
+                                <div class="text-xl font-semibold">${slide.title}</div>
+                            </div>
+                        </div>
+                        <!-- 日付バッジ -->
+                        <div class="absolute top-4 right-4 bg-white bg-opacity-90 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
+                            ${new Date(slide.date).toLocaleDateString('ja-JP')}
+                        </div>
+                    </div>
+                    
+                    <!-- コンテンツ -->
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">${slide.title}</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-3">${slide.description}</p>
+                        
+                        <!-- タグ -->
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            ${slide.tags.map(tag => `
+                                <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                                    ${tag}
+                                </span>
+                            `).join('')}
+                        </div>
+                        
+                        <!-- アクション -->
+                        <div class="flex gap-3">
+                            <a href="/${slide.name}/" 
+                               class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-center hover:bg-blue-700 transition-colors">
+                                スライドを見る
+                            </a>
+                            <a href="/${slide.name}/presenter/" 
+                               class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                               title="発表者モード">
+                                🎤
+                            </a>
+                            <a href="/${slide.name}/overview/" 
+                               class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                               title="概要モード">
+                                📋
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        </section>
+
+        <!-- 技術スタック -->
+        <section class="mt-16">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                    ⚙️ 技術スタック
+                </h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                    <div>
+                        <div class="text-3xl mb-2">🎪</div>
+                        <div class="font-semibold text-gray-800">Slidev</div>
+                        <div class="text-sm text-gray-600">52.0.0</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl mb-2">⚡</div>
+                        <div class="font-semibold text-gray-800">Vue.js</div>
+                        <div class="text-sm text-gray-600">3.4+</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl mb-2">🌐</div>
+                        <div class="font-semibold text-gray-800">Vercel</div>
+                        <div class="text-sm text-gray-600">Hosting</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl mb-2">📦</div>
+                        <div class="font-semibold text-gray-800">pnpm</div>
+                        <div class="text-sm text-gray-600">Workspace</div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
-    
-    <footer>
-      <p>Powered by <a href="https://sli.dev" target="_blank">Slidev</a> & <a href="https://vercel.com" target="_blank">Vercel</a></p>
-      <a href="https://github.com/wwlapaki310/my-slidev-presentations" target="_blank" class="github-link">
-        📱 GitHub Repository
-      </a>
-      <p style="margin-top: 1rem; font-size: 0.9rem;">
-        最終ビルド: ${new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}
-      </p>
+
+    <!-- フッター -->
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p class="text-gray-300">
+                Built with ❤️ using Slidev + Vercel + pnpm workspace
+            </p>
+            <p class="text-gray-400 text-sm mt-2">
+                © 2025 Satoru Akita. All rights reserved.
+            </p>
+        </div>
     </footer>
-  </div>
 </body>
 </html>`;
 
-  try {
-    // Write index.html
-    fs.writeFileSync('dist/index.html', indexHtml);
-    console.log('✅ Index page built successfully with fixed workspace structure!');
-    console.log(`📊 Generated index for ${presentations.length} presentation(s)`);
+// dist/index.htmlファイルを生成
+function generateIndexPage() {
+    const distDir = 'dist';
     
-    // Create a simple robots.txt for SEO
-    const robotsTxt = `User-agent: *\nAllow: /\n\nSitemap: https://my-slidev-eight.vercel.app/sitemap.xml`;
-    fs.writeFileSync('dist/robots.txt', robotsTxt);
+    // distディレクトリが存在しない場合は作成
+    if (!fs.existsSync(distDir)) {
+        fs.mkdirSync(distDir, { recursive: true });
+    }
     
-    console.log('🤖 robots.txt created');
+    // index.htmlを生成
+    const indexPath = path.join(distDir, 'index.html');
+    fs.writeFileSync(indexPath, htmlTemplate);
     
-    // Generate sitemap.xml for SEO
-    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://my-slidev-eight.vercel.app/</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  ${presentations.map(p => `
-  <url>
-    <loc>https://my-slidev-eight.vercel.app${p.path}</loc>
-    <lastmod>${p.lastUpdated}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>`).join('')}
-</urlset>`;
-    fs.writeFileSync('dist/sitemap.xml', sitemap);
-    console.log('🗺️ sitemap.xml created');
-    
-    // 最終的なファイル構造を確認
-    console.log('\n📋 Final dist structure:');
-    debugFileStructure('dist');
-    
-  } catch (error) {
-    console.error('❌ Build failed:', error);
-    process.exit(1);
-  }
-};
-
-// エラーハンドリング付きで実行
-try {
-  generateIndexPage();
-  console.log('🎉 Fixed workspace build completed successfully');
-} catch (error) {
-  console.error('💥 Fatal error during build:', error);
-  process.exit(1);
+    console.log('✅ Generated index.html successfully');
+    console.log(`📁 Output: ${indexPath}`);
+    console.log(`📊 Slides included: ${slides.length}`);
+    slides.forEach(slide => {
+        console.log(`   - ${slide.title} (/${slide.name}/)`);
+    });
 }
+
+// スクリプト実行
+if (import.meta.url === `file://${process.argv[1]}`) {
+    generateIndexPage();
+}
+
+export { generateIndexPage, slides };
