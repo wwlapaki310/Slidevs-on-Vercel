@@ -5,12 +5,12 @@
   "private": true,
   "scripts": {
     "build": "npm run build:sre-next-2025 && npm run build:slidev-system && npm run build:index",
-    "build:sre-next-2025": "cd sre-next-2025/src && npm install && npm run build",
-    "build:slidev-system": "cd slidev-system/src && npm install && npm run build",
+    "build:sre-next-2025": "cd slides/sre-next-2025/src && npm install && npm run build",
+    "build:slidev-system": "cd slides/slidev-system/src && npm install && npm run build",
     "build:index": "node scripts/build-index.js",
     "create-slide": "node scripts/create-slide.js",
-    "dev:sre-next-2025": "cd sre-next-2025/src && npm run dev",
-    "dev:slidev-system": "cd slidev-system/src && npm run dev"
+    "dev:sre-next-2025": "cd slides/sre-next-2025/src && npm run dev",
+    "dev:slidev-system": "cd slides/slidev-system/src && npm run dev"
   },
   "devDependencies": {
     "playwright-chromium": "^1.45.1"
