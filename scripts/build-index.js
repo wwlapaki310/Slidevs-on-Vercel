@@ -21,6 +21,98 @@ const slides = [
   }
 ];
 
+/**
+ * プレビュー画像のパスを取得する
+ */
+function getPreviewImagePath(slideName) {
+  const previewsDir = 'previews';
+  const previewPath = `${previewsDir}/${slideName}.png`;
+  const fallbackPath = `${previewsDir}/${slideName}-fallback.svg`;
+  
+  // 実際のファイル存在確認はクライアントサイドで行う
+  return {
+    preview: previewPath,
+    fallback: fallbackPath
+  };
+}
+
+/**
+ * スライドカードのHTMLを生成する
+ */
+function generateSlideCard(slide) {
+  const { preview, fallback } = getPreviewImagePath(slide.name);
+  
+  return `
+    <div class="slide-card bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+      <!-- プレビュー画像エリア -->
+      <div class="h-48 relative overflow-hidden bg-gray-100">
+        <img 
+          src="/${preview}" 
+          alt="${slide.title} - Preview"
+          class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+          loading="lazy"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+        />
+        <!-- フォールバック表示 -->
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center" style="display: none;">
+          <div class="text-center text-white">
+            <div class="text-6xl mb-2">🎯</div>
+            <div class="text-xl font-semibold">${slide.title}</div>
+          </div>
+        </div>
+        
+        <!-- 日付バッジ -->
+        <div class="absolute top-4 right-4 bg-white bg-opacity-90 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
+          ${new Date(slide.date).toLocaleDateString('ja-JP')}
+        </div>
+        
+        <!-- ホバー時のオーバーレイ -->
+        <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
+          <div class="text-white text-center">
+            <svg class="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+            </svg>
+            <div class="text-sm font-medium">プレビューを見る</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- コンテンツ -->
+      <div class="p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-3">${slide.title}</h3>
+        <p class="text-gray-600 mb-4 line-clamp-3">${slide.description}</p>
+        
+        <!-- タグ -->
+        <div class="flex flex-wrap gap-2 mb-4">
+          ${slide.tags.map(tag => `
+            <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+              ${tag}
+            </span>
+          `).join('')}
+        </div>
+        
+        <!-- アクション -->
+        <div class="flex gap-3">
+          <a href="/${slide.name}/" 
+             class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-center hover:bg-blue-700 transition-colors">
+            スライドを見る
+          </a>
+          <a href="/${slide.name}/presenter/" 
+             class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+             title="発表者モード">
+            🎤
+          </a>
+          <a href="/${slide.name}/overview/" 
+             class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+             title="概要モード">
+            📋
+          </a>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 // HTMLテンプレート
 const htmlTemplate = `<!DOCTYPE html>
 <html lang="ja">
@@ -40,6 +132,12 @@ const htmlTemplate = `<!DOCTYPE html>
         }
         .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
     </style>
 </head>
@@ -103,57 +201,7 @@ const htmlTemplate = `<!DOCTYPE html>
                 📚 Available Presentations
             </h2>
             <div class="grid md:grid-cols-2 gap-8">
-                ${slides.map(slide => `
-                <div class="slide-card bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-                    <!-- サムネイル エリア -->
-                    <div class="h-48 bg-gradient-to-br from-blue-400 to-purple-500 relative overflow-hidden">
-                        <div class="absolute inset-0 bg-black bg-opacity-20"></div>
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <div class="text-center text-white">
-                                <div class="text-6xl mb-2">🎯</div>
-                                <div class="text-xl font-semibold">${slide.title}</div>
-                            </div>
-                        </div>
-                        <!-- 日付バッジ -->
-                        <div class="absolute top-4 right-4 bg-white bg-opacity-90 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
-                            ${new Date(slide.date).toLocaleDateString('ja-JP')}
-                        </div>
-                    </div>
-                    
-                    <!-- コンテンツ -->
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 mb-3">${slide.title}</h3>
-                        <p class="text-gray-600 mb-4 line-clamp-3">${slide.description}</p>
-                        
-                        <!-- タグ -->
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            ${slide.tags.map(tag => `
-                                <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
-                                    ${tag}
-                                </span>
-                            `).join('')}
-                        </div>
-                        
-                        <!-- アクション -->
-                        <div class="flex gap-3">
-                            <a href="/${slide.name}/" 
-                               class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-center hover:bg-blue-700 transition-colors">
-                                スライドを見る
-                            </a>
-                            <a href="/${slide.name}/presenter/" 
-                               class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
-                               title="発表者モード">
-                                🎤
-                            </a>
-                            <a href="/${slide.name}/overview/" 
-                               class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
-                               title="概要モード">
-                                📋
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                `).join('')}
+                ${slides.map(generateSlideCard).join('')}
             </div>
         </section>
 
@@ -220,7 +268,7 @@ function generateIndexPage() {
     console.log(`📁 Output: ${indexPath}`);
     console.log(`📊 Slides included: ${slides.length}`);
     slides.forEach(slide => {
-        console.log(`   - ${slide.title} (/${slide.name}/)`);
+        console.log(`   - ${slide.title} (/${slide.name}/) - Preview: previews/${slide.name}.png`);
     });
 }
 
