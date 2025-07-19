@@ -4,10 +4,13 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "npm run build:sre-next-2025 && npm run build:slidev-system && npm run build:index",
+    "build": "npm run build:slides && npm run build:index && npm run build:previews",
+    "build:slides": "npm run build:sre-next-2025 && npm run build:slidev-system",
     "build:sre-next-2025": "cd slides/sre-next-2025/src && npm install && npm run build",
     "build:slidev-system": "cd slides/slidev-system/src && npm install && npm run build",
     "build:index": "node scripts/build-index.js",
+    "build:previews": "node scripts/generate-previews.js --with-server",
+    "generate-previews": "node scripts/generate-previews.js",
     "create-slide": "node scripts/create-slide.js",
     "dev:sre-next-2025": "cd slides/sre-next-2025/src && npm run dev",
     "dev:slidev-system": "cd slides/slidev-system/src && npm run dev"
