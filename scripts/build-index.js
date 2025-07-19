@@ -27,40 +27,42 @@ const slides = [
 function generateSlideCard(slide) {
   return `
     <div class="slide-card bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-      <!-- プレビュー画像エリア -->
-      <div class="h-48 relative overflow-hidden bg-gray-100">
-        <!-- メイン画像（プレビュー） -->
-        <img 
-          src="/previews/${slide.name}.png" 
-          alt="${slide.title} - Preview"
-          class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-          loading="lazy"
-          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-        />
-        
-        <!-- フォールバック表示（画像読み込み失敗時のみ） -->
-        <div class="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center" style="display: none;">
-          <div class="text-center text-white">
-            <div class="text-4xl mb-2">🎯</div>
-            <div class="text-lg font-semibold px-4">${slide.title}</div>
+      <!-- プレビュー画像エリア（クリック可能） -->
+      <a href="/${slide.name}/" class="block">
+        <div class="h-48 relative overflow-hidden bg-gray-100 cursor-pointer">
+          <!-- メイン画像（プレビュー） -->
+          <img 
+            src="/previews/${slide.name}.png" 
+            alt="${slide.title} - Preview"
+            class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+            loading="lazy"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+          />
+          
+          <!-- フォールバック表示（画像読み込み失敗時のみ） -->
+          <div class="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center" style="display: none;">
+            <div class="text-center text-white">
+              <div class="text-4xl mb-2">🎯</div>
+              <div class="text-lg font-semibold px-4">${slide.title}</div>
+            </div>
+          </div>
+          
+          <!-- 日付バッジ -->
+          <div class="absolute top-4 right-4 bg-white bg-opacity-90 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
+            ${new Date(slide.date).toLocaleDateString('ja-JP')}
+          </div>
+          
+          <!-- ホバー時のオーバーレイ -->
+          <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
+            <div class="text-white text-center">
+              <svg class="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+              </svg>
+              <div class="text-sm font-medium">スライドを見る</div>
+            </div>
           </div>
         </div>
-        
-        <!-- 日付バッジ -->
-        <div class="absolute top-4 right-4 bg-white bg-opacity-90 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
-          ${new Date(slide.date).toLocaleDateString('ja-JP')}
-        </div>
-        
-        <!-- ホバー時のオーバーレイ（薄く表示） -->
-        <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
-          <div class="text-white text-center">
-            <svg class="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
-            </svg>
-            <div class="text-sm font-medium">スライドを見る</div>
-          </div>
-        </div>
-      </div>
+      </a>
       
       <!-- コンテンツ -->
       <div class="p-6">
