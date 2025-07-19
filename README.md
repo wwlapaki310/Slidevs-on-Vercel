@@ -4,6 +4,8 @@
 
 This project demonstrates how to efficiently manage multiple [Slidev](https://sli.dev/) presentations within a single repository using pnpm workspace and automated deployment with Vercel.
 
+**English** | [简体中文](README.zh-CN.md) | [日本語](README.ja.md)
+
 ## 🌐 Live Demo
 
 - **Main Site**: https://my-slidev-eight.vercel.app/
