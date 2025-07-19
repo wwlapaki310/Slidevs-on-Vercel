@@ -5,5 +5,16 @@
     { "source": "/sre-next-2025/(.*)", "destination": "/sre-next-2025/index.html" },
     { "source": "/slidev-system/(.*)", "destination": "/slidev-system/index.html" },
     { "source": "/", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/previews/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400"
+        }
+      ]
+    }
   ]
 }
