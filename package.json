@@ -9,8 +9,9 @@
     "build:sre-next-2025": "cd slides/sre-next-2025/src && npm install && npm run build",
     "build:slidev-system": "cd slides/slidev-system/src && npm install && npm run build",
     "build:index": "node scripts/build-index.js",
-    "build:previews": "node scripts/generate-previews.js --with-server",
+    "build:previews": "node scripts/generate-previews.js --production",
     "generate-previews": "node scripts/generate-previews.js",
+    "generate-previews:dev": "node scripts/generate-previews.js --with-server",
     "create-slide": "node scripts/create-slide.js",
     "dev:sre-next-2025": "cd slides/sre-next-2025/src && npm run dev",
     "dev:slidev-system": "cd slides/slidev-system/src && npm run dev"
