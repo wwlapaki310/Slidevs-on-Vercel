@@ -15,13 +15,33 @@ async function generatePreviews() {
     fs.mkdirSync(previewsDir, { recursive: true });
   }
 
+  // 本番環境での簡易チェック
+  const isProduction = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+  
+  if (isProduction) {
+    console.log('🏭 Production environment detected');
+    // 本番環境では軽量なフォールバック画像のみ生成
+    for (const slide of slides) {
+      await generateFallbackImage(slide.name, previewsDir);
+    }
+    return;
+  }
+
   let browser;
   
   try {
     // Chromiumブラウザを起動
     browser = await chromium.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--disable-gpu'
+      ]
     });
 
     const context = await browser.newContext({
@@ -86,15 +106,17 @@ async function generatePreviews() {
 }
 
 /**
- * フォールバック画像を生成する（HTMLキャンバス使用）
+ * フォールバック画像を生成する（SVG形式）
  */
 async function generateFallbackImage(slideName, previewsDir) {
   console.log(`🎨 Generating fallback image for: ${slideName}`);
   
-  // 簡単なSVGフォールバック画像を作成
+  // スライド情報を取得
   const slide = slides.find(s => s.name === slideName);
   const title = slide ? slide.title : slideName;
+  const description = slide ? slide.description : 'Slidev Presentation';
   
+  // SVGフォールバック画像を作成
   const svgContent = `
     <svg width="1280" height="720" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -105,56 +127,59 @@ async function generateFallbackImage(slideName, previewsDir) {
       </defs>
       <rect width="1280" height="720" fill="url(#grad)"/>
       <rect x="40" y="40" width="1200" height="640" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" rx="20"/>
-      <text x="640" y="300" font-family="Arial, sans-serif" font-size="48" font-weight="bold" 
+      
+      <!-- タイトル -->
+      <text x="640" y="280" font-family="Arial, sans-serif" font-size="42" font-weight="bold" 
             text-anchor="middle" fill="white">${title}</text>
-      <text x="640" y="380" font-family="Arial, sans-serif" font-size="24" 
-            text-anchor="middle" fill="rgba(255,255,255,0.8)">🎯 Slidev Presentation</text>
-      <text x="640" y="450" font-family="Arial, sans-serif" font-size="18" 
-            text-anchor="middle" fill="rgba(255,255,255,0.6)">Preview not available</text>
+      
+      <!-- 説明 -->
+      <text x="640" y="340" font-family="Arial, sans-serif" font-size="18" 
+            text-anchor="middle" fill="rgba(255,255,255,0.8)">${description.length > 60 ? description.substring(0, 60) + '...' : description}</text>
+      
+      <!-- アイコン -->
+      <text x="640" y="450" font-family="Arial, sans-serif" font-size="64" 
+            text-anchor="middle" fill="rgba(255,255,255,0.9)">🎯</text>
+      
+      <!-- フッター -->
+      <text x="640" y="520" font-family="Arial, sans-serif" font-size="16" 
+            text-anchor="middle" fill="rgba(255,255,255,0.6)">Slidev Presentation</text>
     </svg>
   `;
   
-  const fallbackPath = path.join(previewsDir, `${slideName}-fallback.svg`);
+  // PNG形式として保存（SVGだがPNG拡張子で統一）
+  const fallbackPath = path.join(previewsDir, `${slideName}.png`);
   fs.writeFileSync(fallbackPath, svgContent);
   
   console.log(`💾 Fallback image created: ${fallbackPath}`);
 }
 
 /**
- * 開発環境でのプレビュー生成（ローカルサーバー起動後）
+ * 本番環境用の軽量プレビュー生成
  */
-async function generatePreviewsWithLocalServer() {
-  console.log('🚀 Starting local server for preview generation...');
+async function generateProductionPreviews() {
+  console.log('🏭 Generating production previews (fallback only)...');
   
-  // 簡単なHTTPサーバーを起動する関数
-  const { spawn } = await import('child_process');
-  
-  // distディレクトリでHTTPサーバーを起動
-  const server = spawn('python3', ['-m', 'http.server', '3000'], {
-    cwd: 'dist',
-    stdio: 'pipe'
-  });
-  
-  // サーバー起動を待つ
-  await new Promise(resolve => setTimeout(resolve, 3000));
-  
-  try {
-    await generatePreviews();
-  } finally {
-    // サーバーを停止
-    server.kill();
+  const previewsDir = 'dist/previews';
+  if (!fs.existsSync(previewsDir)) {
+    fs.mkdirSync(previewsDir, { recursive: true });
   }
+  
+  for (const slide of slides) {
+    await generateFallbackImage(slide.name, previewsDir);
+  }
+  
+  console.log('✅ Production previews generated!');
 }
 
-// スクリプトが直接実行された場合の処理
+// スクリプト実行
 if (import.meta.url === `file://${process.argv[1]}`) {
   const args = process.argv.slice(2);
   
-  if (args.includes('--with-server')) {
-    generatePreviewsWithLocalServer();
+  if (args.includes('--production')) {
+    generateProductionPreviews();
   } else {
     generatePreviews();
   }
 }
 
-export { generatePreviews, generatePreviewsWithLocalServer };
+export { generatePreviews, generateProductionPreviews };
