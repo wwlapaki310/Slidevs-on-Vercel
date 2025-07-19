@@ -1,60 +1,34 @@
 import fs from 'fs';
 import path from 'path';
-
-// スライド情報の設定
-const slides = [
-  {
-    name: 'sre-next-2025',
-    title: 'SRE NEXT 2025 - NoCスタッフ体験記',
-    description: 'SRE NEXT 2025でNoCスタッフをやった話とSRE NEXTの講演紹介',
-    date: '2025-07-17',
-    author: 'Satoru Akita',
-    tags: ['SRE', 'NoC', 'Infrastructure', 'Conference']
-  },
-  {
-    name: 'slidev-system',
-    title: 'Slidev × Vercel 複数スライド管理システム',
-    description: '1つのリポジトリで複数のSlidevプレゼンテーションを効率的に管理する仕組みの解説',
-    date: '2025-07-18',
-    author: 'Satoru Akita',
-    tags: ['Slidev', 'Vercel', 'DevOps', 'Automation']
-  }
-];
-
-/**
- * 全タグを抽出する
- */
-function extractAllTags(slides) {
-  const allTags = new Set();
-  slides.forEach(slide => {
-    slide.tags.forEach(tag => allTags.add(tag));
-  });
-  return Array.from(allTags).sort();
-}
+import { slideMetadata, tagCategories, extractAllTags, getTagsByCategory } from './config/slides-metadata.js';
 
 /**
  * 検索UIのHTMLを生成する
  */
 function generateSearchUI() {
-  const allTags = extractAllTags(slides);
-  
-  // タグ表示数を制限（デスクトップで1行に収まるよう）
-  const maxVisibleTags = 6; // 「すべて」ボタン + 6個のタグで約1行
-  const visibleTags = allTags.slice(0, maxVisibleTags);
-  const hiddenTags = allTags.slice(maxVisibleTags);
+  const allTags = extractAllTags(slideMetadata);
   
   return `
     <!-- 検索・フィルタセクション -->
     <section class="mb-8">
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div class="max-w-4xl mx-auto">
+          <!-- タグ管理へのリンク -->
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold text-gray-800">🔍 検索・フィルタ</h2>
+            <a href="/manage-tags.html" 
+               class="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full hover:bg-blue-200 transition-colors">
+              🏷️ タグ管理
+            </a>
+          </div>
+          
           <!-- 検索ボックス -->
           <div class="mb-6">
             <div class="relative">
               <input 
                 type="text" 
                 id="searchInput" 
-                placeholder="タグで検索（例：SRE, Vercel, DevOps）..."
+                placeholder="タグ、タイトル、内容で検索（例：SRE, Vercel, DevOps）..."
                 class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               />
               <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -63,60 +37,27 @@ function generateSearchUI() {
             </div>
           </div>
           
-          <!-- タグフィルタボタン -->
+          <!-- タグフィルタ -->
           <div class="mb-4">
-            <div class="flex flex-wrap gap-2" id="tagContainer">
-              <button 
-                class="tag-filter-btn active px-4 py-2 rounded-full text-sm font-medium transition-colors border"
-                data-tag="all"
-              >
-                すべて (${slides.length})
+            <div class="flex flex-wrap gap-2 mb-3" id="tagContainer">
+              <button class="tag-filter-btn active px-4 py-2 rounded-full text-sm font-medium transition-colors border" data-tag="all">
+                すべて (${slideMetadata.length})
               </button>
-              ${visibleTags.map(tag => {
-                const count = slides.filter(slide => slide.tags.includes(tag)).length;
+              ${allTags.map(tag => {
+                const count = slideMetadata.filter(slide => slide.tags.includes(tag)).length;
                 return `
-                  <button 
-                    class="tag-filter-btn px-4 py-2 rounded-full text-sm font-medium transition-colors border"
-                    data-tag="${tag}"
-                  >
+                  <button class="tag-filter-btn px-3 py-1 rounded-full text-xs font-medium transition-colors border" data-tag="${tag}">
                     ${tag} (${count})
                   </button>
                 `;
               }).join('')}
-              ${hiddenTags.length > 0 ? `
-                <div class="hidden-tags" style="display: none;">
-                  ${hiddenTags.map(tag => {
-                    const count = slides.filter(slide => slide.tags.includes(tag)).length;
-                    return `
-                      <button 
-                        class="tag-filter-btn px-4 py-2 rounded-full text-sm font-medium transition-colors border"
-                        data-tag="${tag}"
-                      >
-                        ${tag} (${count})
-                      </button>
-                    `;
-                  }).join('')}
-                </div>
-                <button 
-                  id="showMoreTags"
-                  class="px-4 py-2 rounded-full text-sm font-medium transition-colors border border-gray-300 text-gray-600 hover:bg-gray-50"
-                >
-                  +${hiddenTags.length} その他のタグ
-                </button>
-                <button 
-                  id="showLessTags"
-                  class="px-4 py-2 rounded-full text-sm font-medium transition-colors border border-gray-300 text-gray-600 hover:bg-gray-50"
-                  style="display: none;"
-                >
-                  タグを閉じる
-                </button>
-              ` : ''}
             </div>
           </div>
           
           <!-- 検索結果表示 -->
-          <div id="searchResults" class="text-sm text-gray-600">
-            <span id="resultCount">${slides.length}</span> 件のプレゼンテーションが見つかりました
+          <div id="searchResults" class="text-sm text-gray-600 flex items-center justify-between">
+            <span><span id="resultCount">${slideMetadata.length}</span> 件のプレゼンテーションが見つかりました</span>
+            <button id="clearFilters" class="text-blue-600 hover:text-blue-800 font-medium" style="display: none;">フィルタをクリア</button>
           </div>
         </div>
       </div>
@@ -129,11 +70,13 @@ function generateSearchUI() {
  */
 function generateSlideCard(slide) {
   return `
-    <div class="slide-card bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden" data-tags="${slide.tags.join(',')}" data-title="${slide.title}" data-description="${slide.description}">
-      <!-- プレビュー画像エリア（クリック可能） -->
+    <div class="slide-card bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden" 
+         data-tags="${slide.tags.join(',')}" 
+         data-title="${slide.title}" 
+         data-description="${slide.description}">
+      
       <a href="/${slide.name}/" class="block">
         <div class="h-48 relative overflow-hidden bg-gray-100 cursor-pointer">
-          <!-- メイン画像（プレビュー） -->
           <img 
             src="/previews/${slide.name}.png" 
             alt="${slide.title} - Preview"
@@ -142,20 +85,17 @@ function generateSlideCard(slide) {
             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
           />
           
-          <!-- フォールバック表示（画像読み込み失敗時のみ） -->
-          <div class="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center" style="display: none;">
+          <div class="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center" style="display: none;">
             <div class="text-center text-white">
               <div class="text-4xl mb-2">🎯</div>
               <div class="text-lg font-semibold px-4">${slide.title}</div>
             </div>
           </div>
           
-          <!-- 日付バッジ -->
           <div class="absolute top-4 right-4 bg-white bg-opacity-90 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
             ${new Date(slide.date).toLocaleDateString('ja-JP')}
           </div>
           
-          <!-- ホバー時のオーバーレイ -->
           <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
             <div class="text-white text-center">
               <svg class="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
@@ -167,12 +107,10 @@ function generateSlideCard(slide) {
         </div>
       </a>
       
-      <!-- コンテンツ -->
       <div class="p-6">
         <h3 class="text-xl font-bold text-gray-800 mb-3">${slide.title}</h3>
         <p class="text-gray-600 mb-4 line-clamp-3">${slide.description}</p>
         
-        <!-- タグ -->
         <div class="flex flex-wrap gap-2 mb-4">
           ${slide.tags.map(tag => `
             <span class="slide-tag px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full cursor-pointer hover:bg-blue-200 transition-colors" data-tag="${tag}">
@@ -181,20 +119,14 @@ function generateSlideCard(slide) {
           `).join('')}
         </div>
         
-        <!-- アクション -->
         <div class="flex gap-3">
-          <a href="/${slide.name}/" 
-             class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-center hover:bg-blue-700 transition-colors">
+          <a href="/${slide.name}/" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-center hover:bg-blue-700 transition-colors">
             スライドを見る
           </a>
-          <a href="/${slide.name}/presenter/" 
-             class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
-             title="発表者モード">
+          <a href="/${slide.name}/presenter/" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors" title="発表者モード">
             🎤
           </a>
-          <a href="/${slide.name}/overview/" 
-             class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
-             title="概要モード">
+          <a href="/${slide.name}/overview/" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors" title="概要モード">
             📋
           </a>
         </div>
@@ -209,87 +141,16 @@ function generateSlideCard(slide) {
 function generateSearchScript() {
   return `
     <script>
-      // スライドデータ
-      const slidesData = ${JSON.stringify(slides)};
-      
-      // DOM要素
+      const slidesData = ${JSON.stringify(slideMetadata)};
       const searchInput = document.getElementById('searchInput');
       const tagFilterBtns = document.querySelectorAll('.tag-filter-btn');
       const slideCards = document.querySelectorAll('.slide-card');
       const resultCount = document.getElementById('resultCount');
       const slideTags = document.querySelectorAll('.slide-tag');
-      const showMoreTags = document.getElementById('showMoreTags');
-      const showLessTags = document.getElementById('showLessTags');
-      const hiddenTags = document.querySelector('.hidden-tags');
+      const clearFilters = document.getElementById('clearFilters');
       
-      // 現在のフィルタ状態
-      let currentFilter = {
-        tags: [],
-        searchText: ''
-      };
+      let currentFilter = { tags: [], searchText: '' };
       
-      // タグ表示の切り替え
-      if (showMoreTags) {
-        showMoreTags.addEventListener('click', () => {
-          hiddenTags.style.display = 'inline';
-          showMoreTags.style.display = 'none';
-          showLessTags.style.display = 'inline-block';
-        });
-      }
-      
-      if (showLessTags) {
-        showLessTags.addEventListener('click', () => {
-          hiddenTags.style.display = 'none';
-          showMoreTags.style.display = 'inline-block';
-          showLessTags.style.display = 'none';
-        });
-      }
-      
-      // URLハッシュから初期状態を読み込み
-      function loadFromHash() {
-        const hash = window.location.hash.slice(1);
-        if (hash) {
-          try {
-            const params = new URLSearchParams(hash);
-            const tags = params.get('tags');
-            const search = params.get('search');
-            
-            if (tags) {
-              currentFilter.tags = tags.split(',');
-            }
-            if (search) {
-              currentFilter.searchText = search;
-              searchInput.value = search;
-            }
-            
-            applyFilters();
-            updateTagButtons();
-          } catch (e) {
-            console.log('Hash parsing failed:', e);
-          }
-        }
-      }
-      
-      // URLハッシュを更新
-      function updateHash() {
-        const params = new URLSearchParams();
-        
-        if (currentFilter.tags.length > 0 && !currentFilter.tags.includes('all')) {
-          params.set('tags', currentFilter.tags.join(','));
-        }
-        if (currentFilter.searchText) {
-          params.set('search', currentFilter.searchText);
-        }
-        
-        const hashString = params.toString();
-        const newHash = hashString ? '#' + hashString : '';
-        
-        if (window.location.hash !== newHash) {
-          window.location.hash = newHash;
-        }
-      }
-      
-      // フィルタを適用
       function applyFilters() {
         let visibleCount = 0;
         
@@ -299,60 +160,49 @@ function generateSearchScript() {
           const cardDescription = card.dataset.description.toLowerCase();
           const searchText = currentFilter.searchText.toLowerCase();
           
-          // タグフィルタチェック
           const tagMatch = currentFilter.tags.length === 0 || 
                           currentFilter.tags.includes('all') ||
                           currentFilter.tags.some(filterTag => cardTags.includes(filterTag));
           
-          // 検索テキストチェック
           const textMatch = !searchText || 
                            cardTags.some(tag => tag.toLowerCase().includes(searchText)) ||
                            cardTitle.includes(searchText) ||
                            cardDescription.includes(searchText);
           
-          // 表示/非表示を決定
           if (tagMatch && textMatch) {
             card.style.display = 'block';
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
             visibleCount++;
           } else {
             card.style.display = 'none';
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(10px)';
           }
         });
         
-        // 結果数を更新
         resultCount.textContent = visibleCount;
         
-        // URLハッシュを更新
-        updateHash();
+        const hasFilters = currentFilter.tags.length > 0 || currentFilter.searchText;
+        clearFilters.style.display = hasFilters ? 'inline-block' : 'none';
       }
       
-      // タグボタンの状態を更新
       function updateTagButtons() {
         tagFilterBtns.forEach(btn => {
           const tag = btn.dataset.tag;
           if (currentFilter.tags.includes(tag) || (currentFilter.tags.length === 0 && tag === 'all')) {
             btn.classList.add('active');
-            btn.classList.remove('border-gray-300', 'text-gray-700', 'hover:bg-gray-50');
+            btn.classList.remove('border-gray-300', 'text-gray-700');
             btn.classList.add('border-blue-500', 'bg-blue-500', 'text-white');
           } else {
             btn.classList.remove('active');
             btn.classList.remove('border-blue-500', 'bg-blue-500', 'text-white');
-            btn.classList.add('border-gray-300', 'text-gray-700', 'hover:bg-gray-50');
+            btn.classList.add('border-gray-300', 'text-gray-700');
           }
         });
       }
       
-      // 検索入力イベント
       searchInput.addEventListener('input', (e) => {
         currentFilter.searchText = e.target.value;
         applyFilters();
       });
       
-      // タグフィルタボタンイベント
       tagFilterBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
           const tag = e.target.dataset.tag;
@@ -361,12 +211,9 @@ function generateSearchScript() {
             currentFilter.tags = [];
           } else {
             if (currentFilter.tags.includes(tag)) {
-              // タグを除去
               currentFilter.tags = currentFilter.tags.filter(t => t !== tag);
             } else {
-              // タグを追加
               currentFilter.tags.push(tag);
-              // 'all'タグがあれば除去
               currentFilter.tags = currentFilter.tags.filter(t => t !== 'all');
             }
           }
@@ -376,7 +223,6 @@ function generateSearchScript() {
         });
       });
       
-      // スライド内タグクリックイベント
       slideTags.forEach(tag => {
         tag.addEventListener('click', (e) => {
           e.preventDefault();
@@ -386,21 +232,18 @@ function generateSearchScript() {
             currentFilter.tags = [tagName];
             updateTagButtons();
             applyFilters();
-            
-            // 必要に応じて隠されたタグを表示
-            if (hiddenTags && hiddenTags.querySelector(\`[data-tag="\${tagName}"]\`)) {
-              showMoreTags.click();
-            }
           }
         });
       });
       
-      // ブラウザの戻る/進むボタン対応
-      window.addEventListener('hashchange', loadFromHash);
+      clearFilters.addEventListener('click', () => {
+        currentFilter = { tags: [], searchText: '' };
+        searchInput.value = '';
+        updateTagButtons();
+        applyFilters();
+      });
       
-      // 初期化
       document.addEventListener('DOMContentLoaded', () => {
-        loadFromHash();
         updateTagButtons();
       });
     </script>
@@ -445,9 +288,6 @@ const htmlTemplate = `<!DOCTYPE html>
         .tag-filter-btn:hover:not(.active) {
             background-color: #f9fafb;
         }
-        .hidden-tags .tag-filter-btn {
-            margin: 2px;
-        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -455,13 +295,11 @@ const htmlTemplate = `<!DOCTYPE html>
     <header class="gradient-bg text-white shadow-lg">
         <div class="max-w-6xl mx-auto px-4 py-8">
             <div class="text-center">
-                <h1 class="text-4xl md:text-5xl font-bold mb-4">
-                    🎪 My Slidev Presentations
-                </h1>
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">🎪 My Slidev Presentations</h1>
                 <p class="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto">
                     複数のSlidevプレゼンテーションを1つのリポジトリで管理するシステム
                 </p>
-                <div class="mt-6">
+                <div class="mt-6 flex gap-4 justify-center">
                     <a href="https://github.com/wwlapaki310/my-slidev-presentations" 
                        class="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center gap-2"
                        target="_blank">
@@ -469,6 +307,10 @@ const htmlTemplate = `<!DOCTYPE html>
                             <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clip-rule="evenodd"></path>
                         </svg>
                         GitHub Repository
+                    </a>
+                    <a href="/manage-tags.html" 
+                       class="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors inline-flex items-center gap-2">
+                        🏷️ タグ管理
                     </a>
                 </div>
             </div>
@@ -508,20 +350,16 @@ const htmlTemplate = `<!DOCTYPE html>
 
         <!-- スライド一覧 -->
         <section id="slidesSection">
-            <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">
-                📚 Available Presentations
-            </h2>
+            <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">📚 Available Presentations</h2>
             <div class="grid md:grid-cols-2 gap-8" id="slidesContainer">
-                ${slides.map(generateSlideCard).join('')}
+                ${slideMetadata.map(generateSlideCard).join('')}
             </div>
         </section>
 
         <!-- 技術スタック -->
         <section class="mt-16">
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
-                    ⚙️ 技術スタック
-                </h2>
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">⚙️ 技術スタック</h2>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
                     <div>
                         <div class="text-3xl mb-2">🎪</div>
@@ -551,12 +389,8 @@ const htmlTemplate = `<!DOCTYPE html>
     <!-- フッター -->
     <footer class="bg-gray-800 text-white py-8 mt-16">
         <div class="max-w-6xl mx-auto px-4 text-center">
-            <p class="text-gray-300">
-                Built with ❤️ using Slidev + Vercel + pnpm workspace
-            </p>
-            <p class="text-gray-400 text-sm mt-2">
-                © 2025 Satoru Akita. All rights reserved.
-            </p>
+            <p class="text-gray-300">Built with ❤️ using Slidev + Vercel + pnpm workspace</p>
+            <p class="text-gray-400 text-sm mt-2">© 2025 Satoru Akita. All rights reserved.</p>
         </div>
     </footer>
 
@@ -568,19 +402,17 @@ const htmlTemplate = `<!DOCTYPE html>
 function generateIndexPage() {
     const distDir = 'dist';
     
-    // distディレクトリが存在しない場合は作成
     if (!fs.existsSync(distDir)) {
         fs.mkdirSync(distDir, { recursive: true });
     }
     
-    // index.htmlを生成
     const indexPath = path.join(distDir, 'index.html');
     fs.writeFileSync(indexPath, htmlTemplate);
     
     console.log('✅ Generated index.html successfully');
     console.log(`📁 Output: ${indexPath}`);
-    console.log(`📊 Slides included: ${slides.length}`);
-    slides.forEach(slide => {
+    console.log(`📊 Slides included: ${slideMetadata.length}`);
+    slideMetadata.forEach(slide => {
         console.log(`   - ${slide.title} (/${slide.name}/) - Preview: previews/${slide.name}.png`);
     });
 }
@@ -590,4 +422,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     generateIndexPage();
 }
 
-export { generateIndexPage, slides };
+export { generateIndexPage, slideMetadata };
