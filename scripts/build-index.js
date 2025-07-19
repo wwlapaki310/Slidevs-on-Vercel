@@ -38,6 +38,11 @@ function extractAllTags(slides) {
 function generateSearchUI() {
   const allTags = extractAllTags(slides);
   
+  // タグ表示数を制限（デスクトップで1行に収まるよう）
+  const maxVisibleTags = 6; // 「すべて」ボタン + 6個のタグで約1行
+  const visibleTags = allTags.slice(0, maxVisibleTags);
+  const hiddenTags = allTags.slice(maxVisibleTags);
+  
   return `
     <!-- 検索・フィルタセクション -->
     <section class="mb-8">
@@ -60,14 +65,14 @@ function generateSearchUI() {
           
           <!-- タグフィルタボタン -->
           <div class="mb-4">
-            <div class="flex flex-wrap gap-2">
+            <div class="flex flex-wrap gap-2" id="tagContainer">
               <button 
                 class="tag-filter-btn active px-4 py-2 rounded-full text-sm font-medium transition-colors border"
                 data-tag="all"
               >
                 すべて (${slides.length})
               </button>
-              ${allTags.map(tag => {
+              ${visibleTags.map(tag => {
                 const count = slides.filter(slide => slide.tags.includes(tag)).length;
                 return `
                   <button 
@@ -78,6 +83,34 @@ function generateSearchUI() {
                   </button>
                 `;
               }).join('')}
+              ${hiddenTags.length > 0 ? `
+                <div class="hidden-tags" style="display: none;">
+                  ${hiddenTags.map(tag => {
+                    const count = slides.filter(slide => slide.tags.includes(tag)).length;
+                    return `
+                      <button 
+                        class="tag-filter-btn px-4 py-2 rounded-full text-sm font-medium transition-colors border"
+                        data-tag="${tag}"
+                      >
+                        ${tag} (${count})
+                      </button>
+                    `;
+                  }).join('')}
+                </div>
+                <button 
+                  id="showMoreTags"
+                  class="px-4 py-2 rounded-full text-sm font-medium transition-colors border border-gray-300 text-gray-600 hover:bg-gray-50"
+                >
+                  +${hiddenTags.length} その他のタグ
+                </button>
+                <button 
+                  id="showLessTags"
+                  class="px-4 py-2 rounded-full text-sm font-medium transition-colors border border-gray-300 text-gray-600 hover:bg-gray-50"
+                  style="display: none;"
+                >
+                  タグを閉じる
+                </button>
+              ` : ''}
             </div>
           </div>
           
@@ -185,12 +218,32 @@ function generateSearchScript() {
       const slideCards = document.querySelectorAll('.slide-card');
       const resultCount = document.getElementById('resultCount');
       const slideTags = document.querySelectorAll('.slide-tag');
+      const showMoreTags = document.getElementById('showMoreTags');
+      const showLessTags = document.getElementById('showLessTags');
+      const hiddenTags = document.querySelector('.hidden-tags');
       
       // 現在のフィルタ状態
       let currentFilter = {
         tags: [],
         searchText: ''
       };
+      
+      // タグ表示の切り替え
+      if (showMoreTags) {
+        showMoreTags.addEventListener('click', () => {
+          hiddenTags.style.display = 'inline';
+          showMoreTags.style.display = 'none';
+          showLessTags.style.display = 'inline-block';
+        });
+      }
+      
+      if (showLessTags) {
+        showLessTags.addEventListener('click', () => {
+          hiddenTags.style.display = 'none';
+          showMoreTags.style.display = 'inline-block';
+          showLessTags.style.display = 'none';
+        });
+      }
       
       // URLハッシュから初期状態を読み込み
       function loadFromHash() {
@@ -333,6 +386,11 @@ function generateSearchScript() {
             currentFilter.tags = [tagName];
             updateTagButtons();
             applyFilters();
+            
+            // 必要に応じて隠されたタグを表示
+            if (hiddenTags && hiddenTags.querySelector(\`[data-tag="\${tagName}"]\`)) {
+              showMoreTags.click();
+            }
           }
         });
       });
@@ -386,6 +444,9 @@ const htmlTemplate = `<!DOCTYPE html>
         }
         .tag-filter-btn:hover:not(.active) {
             background-color: #f9fafb;
+        }
+        .hidden-tags .tag-filter-btn {
+            margin: 2px;
         }
     </style>
 </head>
