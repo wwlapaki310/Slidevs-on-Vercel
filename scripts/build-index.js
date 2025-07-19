@@ -40,9 +40,6 @@ function generateSearchUI() {
             <div class="max-w-4xl mx-auto">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold text-gray-800">🔍 検索・フィルタ</h2>
-                    <div id="connectionStatus" class="text-sm px-3 py-1 rounded-full bg-yellow-100">
-                        <span class="text-yellow-600">⏳ API接続確認中...</span>
-                    </div>
                 </div>
                 <div class="mb-6">
                     <div class="relative">
@@ -121,43 +118,14 @@ function generateSlideCard(slide) {
 
 function generateTagManagementScript() {
     return `
-    <script src="/scripts/tag-management-api.js"></script>
     <script>
         let slidesData = ${JSON.stringify(slideMetadata)};
-        let tagCategoriesData = ${JSON.stringify(tagCategories)};
-        let tagManager = null;
-        let isApiConnected = false;
         let currentFilter = { tags: [], searchText: '' };
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            await waitForTagManager();
-            updateConnectionStatus();
+        document.addEventListener('DOMContentLoaded', () => {
             setupEventListeners();
             updateTagButtons();
         });
-
-        async function waitForTagManager() {
-            let attempts = 0;
-            while (!window.tagManager && attempts < 50) {
-                await new Promise(resolve => setTimeout(resolve, 100));
-                attempts++;
-            }
-            if (window.tagManager) {
-                tagManager = window.tagManager;
-                isApiConnected = await tagManager.testConnection();
-            }
-        }
-
-        function updateConnectionStatus() {
-            const status = document.getElementById('connectionStatus');
-            if (isApiConnected) {
-                status.innerHTML = '<span class="text-green-600">🟢 GitHub API 接続済み</span>';
-                status.className = 'text-sm px-3 py-1 rounded-full bg-green-100';
-            } else {
-                status.innerHTML = '<span class="text-red-600">🔴 ローカルモード</span>';
-                status.className = 'text-sm px-3 py-1 rounded-full bg-red-100';
-            }
-        }
 
         function setupEventListeners() {
             document.getElementById('searchInput').addEventListener('input', (e) => {
@@ -198,80 +166,49 @@ function generateTagManagementScript() {
                     const slideName = tagElement.dataset.slide;
                     const tagName = tagElement.dataset.tag;
                     if (confirm(\`"\${tagName}" タグを削除しますか？\`)) {
-                        await removeTagFromSlide(slideName, tagName);
+                        removeTagFromSlide(slideName, tagName);
                     }
                 }
                 if (e.target.closest('.add-tag-btn')) {
                     e.preventDefault();
                     const button = e.target.closest('.add-tag-btn');
                     const slideName = button.dataset.slide;
-                    await showAddTagModal(slideName);
+                    showAddTagModal(slideName);
                 }
             });
         }
 
-        async function removeTagFromSlide(slideName, tagName) {
-            try {
-                if (isApiConnected) {
-                    await tagManager.removeTagFromSlide(slideName, tagName);
-                    showMessage(\`"\${tagName}" を削除しました（GitHub同期済み）\`, 'success');
-                } else {
-                    const slide = slidesData.find(s => s.name === slideName);
-                    if (slide) {
-                        slide.tags = slide.tags.filter(t => t !== tagName);
-                        showMessage(\`"\${tagName}" を削除しました（ローカルのみ）\`, 'warning');
-                    }
-                }
+        function removeTagFromSlide(slideName, tagName) {
+            const slide = slidesData.find(s => s.name === slideName);
+            if (slide) {
+                slide.tags = slide.tags.filter(t => t !== tagName);
                 updateSlideTagsUI(slideName);
-            } catch (error) {
-                showMessage('タグの削除に失敗しました', 'error');
+                showMessage(\`"\${tagName}" を削除しました\`, 'success');
             }
         }
 
-        async function showAddTagModal(slideName) {
+        function showAddTagModal(slideName) {
             const slide = slidesData.find(s => s.name === slideName);
             if (!slide) return;
 
-            const availableTags = [];
-            Object.values(tagCategoriesData).forEach(category => {
-                category.tags.forEach(tag => {
-                    if (!slide.tags.includes(tag)) {
-                        availableTags.push(tag);
-                    }
-                });
-            });
-
-            if (availableTags.length === 0) {
-                alert('このスライドには追加可能なタグがありません。');
-                return;
-            }
-
-            const options = availableTags.map((tag, i) => \`\${i + 1}. \${tag}\`).join('\\n');
-            const selection = prompt(\`"\${slide.title}" に追加するタグを選択してください:\\n\\n\${options}\\n\\n番号を入力してください:\`);
-
-            if (selection) {
-                const index = parseInt(selection) - 1;
-                if (index >= 0 && index < availableTags.length) {
-                    await addTagToSlide(slideName, availableTags[index]);
+            const newTag = prompt(\`"\${slide.title}" に追加するタグを入力してください:\`);
+            
+            if (newTag && newTag.trim()) {
+                const tagName = newTag.trim();
+                if (!slide.tags.includes(tagName)) {
+                    addTagToSlide(slideName, tagName);
+                } else {
+                    alert('そのタグは既に追加されています。');
                 }
             }
         }
 
-        async function addTagToSlide(slideName, tagName) {
-            try {
-                if (isApiConnected) {
-                    await tagManager.addTagToSlide(slideName, tagName);
-                    showMessage(\`"\${tagName}" を追加しました（GitHub同期済み）\`, 'success');
-                } else {
-                    const slide = slidesData.find(s => s.name === slideName);
-                    if (slide && !slide.tags.includes(tagName)) {
-                        slide.tags.push(tagName);
-                        showMessage(\`"\${tagName}" を追加しました（ローカルのみ）\`, 'warning');
-                    }
-                }
+        function addTagToSlide(slideName, tagName) {
+            const slide = slidesData.find(s => s.name === slideName);
+            if (slide && !slide.tags.includes(tagName)) {
+                slide.tags.push(tagName);
                 updateSlideTagsUI(slideName);
-            } catch (error) {
-                showMessage('タグの追加に失敗しました', 'error');
+                showMessage(\`"\${tagName}" を追加しました\`, 'success');
             }
         }
 
@@ -340,12 +277,17 @@ function generateTagManagementScript() {
         }
 
         function showMessage(message, type = 'info') {
-            const colors = { success: 'bg-green-500 text-white', error: 'bg-red-500 text-white', warning: 'bg-yellow-500 text-white', info: 'bg-blue-500 text-white' };
+            const colors = { 
+                success: 'bg-green-500 text-white', 
+                error: 'bg-red-500 text-white', 
+                warning: 'bg-yellow-500 text-white', 
+                info: 'bg-blue-500 text-white' 
+            };
             const messageDiv = document.createElement('div');
             messageDiv.className = \`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 \${colors[type]}\`;
             messageDiv.textContent = message;
             document.body.appendChild(messageDiv);
-            setTimeout(() => messageDiv.remove(), 4000);
+            setTimeout(() => messageDiv.remove(), 3000);
         }
     </script>`;
 }
@@ -441,7 +383,7 @@ function generateIndexPage() {
     const indexPath = path.join(distDir, 'index.html');
     fs.writeFileSync(indexPath, htmlTemplate);
     
-    console.log('✅ Generated index.html with editable tags');
+    console.log('✅ Generated index.html with simple tag editing');
     console.log(`📊 Slides included: ${slideMetadata.length}`);
     slideMetadata.forEach(slide => {
         console.log(`   - ${slide.title} (/${slide.name}/)`);
