@@ -12,6 +12,8 @@
     "build:previews": "node scripts/generate-previews.js --production",
     "generate-previews": "node scripts/generate-previews.js",
     "generate-previews:dev": "node scripts/generate-previews.js --with-server",
+    "generate-previews:local": "npm run build:slides && npm run generate-previews:dev",
+    "update-previews": "npm run generate-previews:local && git add dist/previews/ && git commit -m '🖼️ Update preview images' && git push",
     "create-slide": "node scripts/create-slide.js",
     "dev:sre-next-2025": "cd slides/sre-next-2025/src && npm run dev",
     "dev:slidev-system": "cd slides/slidev-system/src && npm run dev"
