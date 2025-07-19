@@ -22,11 +22,81 @@ const slides = [
 ];
 
 /**
+ * 全タグを抽出する
+ */
+function extractAllTags(slides) {
+  const allTags = new Set();
+  slides.forEach(slide => {
+    slide.tags.forEach(tag => allTags.add(tag));
+  });
+  return Array.from(allTags).sort();
+}
+
+/**
+ * 検索UIのHTMLを生成する
+ */
+function generateSearchUI() {
+  const allTags = extractAllTags(slides);
+  
+  return `
+    <!-- 検索・フィルタセクション -->
+    <section class="mb-8">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="max-w-4xl mx-auto">
+          <!-- 検索ボックス -->
+          <div class="mb-6">
+            <div class="relative">
+              <input 
+                type="text" 
+                id="searchInput" 
+                placeholder="タグで検索（例：SRE, Vercel, DevOps）..."
+                class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              />
+              <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+          </div>
+          
+          <!-- タグフィルタボタン -->
+          <div class="mb-4">
+            <div class="flex flex-wrap gap-2">
+              <button 
+                class="tag-filter-btn active px-4 py-2 rounded-full text-sm font-medium transition-colors border"
+                data-tag="all"
+              >
+                すべて (${slides.length})
+              </button>
+              ${allTags.map(tag => {
+                const count = slides.filter(slide => slide.tags.includes(tag)).length;
+                return `
+                  <button 
+                    class="tag-filter-btn px-4 py-2 rounded-full text-sm font-medium transition-colors border"
+                    data-tag="${tag}"
+                  >
+                    ${tag} (${count})
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          </div>
+          
+          <!-- 検索結果表示 -->
+          <div id="searchResults" class="text-sm text-gray-600">
+            <span id="resultCount">${slides.length}</span> 件のプレゼンテーションが見つかりました
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+/**
  * スライドカードのHTMLを生成する
  */
 function generateSlideCard(slide) {
   return `
-    <div class="slide-card bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+    <div class="slide-card bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden" data-tags="${slide.tags.join(',')}" data-title="${slide.title}" data-description="${slide.description}">
       <!-- プレビュー画像エリア（クリック可能） -->
       <a href="/${slide.name}/" class="block">
         <div class="h-48 relative overflow-hidden bg-gray-100 cursor-pointer">
@@ -72,7 +142,7 @@ function generateSlideCard(slide) {
         <!-- タグ -->
         <div class="flex flex-wrap gap-2 mb-4">
           ${slide.tags.map(tag => `
-            <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+            <span class="slide-tag px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full cursor-pointer hover:bg-blue-200 transition-colors" data-tag="${tag}">
               ${tag}
             </span>
           `).join('')}
@@ -100,6 +170,185 @@ function generateSlideCard(slide) {
   `;
 }
 
+/**
+ * 検索・フィルタリング用JavaScriptを生成する
+ */
+function generateSearchScript() {
+  return `
+    <script>
+      // スライドデータ
+      const slidesData = ${JSON.stringify(slides)};
+      
+      // DOM要素
+      const searchInput = document.getElementById('searchInput');
+      const tagFilterBtns = document.querySelectorAll('.tag-filter-btn');
+      const slideCards = document.querySelectorAll('.slide-card');
+      const resultCount = document.getElementById('resultCount');
+      const slideTags = document.querySelectorAll('.slide-tag');
+      
+      // 現在のフィルタ状態
+      let currentFilter = {
+        tags: [],
+        searchText: ''
+      };
+      
+      // URLハッシュから初期状態を読み込み
+      function loadFromHash() {
+        const hash = window.location.hash.slice(1);
+        if (hash) {
+          try {
+            const params = new URLSearchParams(hash);
+            const tags = params.get('tags');
+            const search = params.get('search');
+            
+            if (tags) {
+              currentFilter.tags = tags.split(',');
+            }
+            if (search) {
+              currentFilter.searchText = search;
+              searchInput.value = search;
+            }
+            
+            applyFilters();
+            updateTagButtons();
+          } catch (e) {
+            console.log('Hash parsing failed:', e);
+          }
+        }
+      }
+      
+      // URLハッシュを更新
+      function updateHash() {
+        const params = new URLSearchParams();
+        
+        if (currentFilter.tags.length > 0 && !currentFilter.tags.includes('all')) {
+          params.set('tags', currentFilter.tags.join(','));
+        }
+        if (currentFilter.searchText) {
+          params.set('search', currentFilter.searchText);
+        }
+        
+        const hashString = params.toString();
+        const newHash = hashString ? '#' + hashString : '';
+        
+        if (window.location.hash !== newHash) {
+          window.location.hash = newHash;
+        }
+      }
+      
+      // フィルタを適用
+      function applyFilters() {
+        let visibleCount = 0;
+        
+        slideCards.forEach(card => {
+          const cardTags = card.dataset.tags.split(',');
+          const cardTitle = card.dataset.title.toLowerCase();
+          const cardDescription = card.dataset.description.toLowerCase();
+          const searchText = currentFilter.searchText.toLowerCase();
+          
+          // タグフィルタチェック
+          const tagMatch = currentFilter.tags.length === 0 || 
+                          currentFilter.tags.includes('all') ||
+                          currentFilter.tags.some(filterTag => cardTags.includes(filterTag));
+          
+          // 検索テキストチェック
+          const textMatch = !searchText || 
+                           cardTags.some(tag => tag.toLowerCase().includes(searchText)) ||
+                           cardTitle.includes(searchText) ||
+                           cardDescription.includes(searchText);
+          
+          // 表示/非表示を決定
+          if (tagMatch && textMatch) {
+            card.style.display = 'block';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(10px)';
+          }
+        });
+        
+        // 結果数を更新
+        resultCount.textContent = visibleCount;
+        
+        // URLハッシュを更新
+        updateHash();
+      }
+      
+      // タグボタンの状態を更新
+      function updateTagButtons() {
+        tagFilterBtns.forEach(btn => {
+          const tag = btn.dataset.tag;
+          if (currentFilter.tags.includes(tag) || (currentFilter.tags.length === 0 && tag === 'all')) {
+            btn.classList.add('active');
+            btn.classList.remove('border-gray-300', 'text-gray-700', 'hover:bg-gray-50');
+            btn.classList.add('border-blue-500', 'bg-blue-500', 'text-white');
+          } else {
+            btn.classList.remove('active');
+            btn.classList.remove('border-blue-500', 'bg-blue-500', 'text-white');
+            btn.classList.add('border-gray-300', 'text-gray-700', 'hover:bg-gray-50');
+          }
+        });
+      }
+      
+      // 検索入力イベント
+      searchInput.addEventListener('input', (e) => {
+        currentFilter.searchText = e.target.value;
+        applyFilters();
+      });
+      
+      // タグフィルタボタンイベント
+      tagFilterBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const tag = e.target.dataset.tag;
+          
+          if (tag === 'all') {
+            currentFilter.tags = [];
+          } else {
+            if (currentFilter.tags.includes(tag)) {
+              // タグを除去
+              currentFilter.tags = currentFilter.tags.filter(t => t !== tag);
+            } else {
+              // タグを追加
+              currentFilter.tags.push(tag);
+              // 'all'タグがあれば除去
+              currentFilter.tags = currentFilter.tags.filter(t => t !== 'all');
+            }
+          }
+          
+          updateTagButtons();
+          applyFilters();
+        });
+      });
+      
+      // スライド内タグクリックイベント
+      slideTags.forEach(tag => {
+        tag.addEventListener('click', (e) => {
+          e.preventDefault();
+          const tagName = e.target.dataset.tag;
+          
+          if (!currentFilter.tags.includes(tagName)) {
+            currentFilter.tags = [tagName];
+            updateTagButtons();
+            applyFilters();
+          }
+        });
+      });
+      
+      // ブラウザの戻る/進むボタン対応
+      window.addEventListener('hashchange', loadFromHash);
+      
+      // 初期化
+      document.addEventListener('DOMContentLoaded', () => {
+        loadFromHash();
+        updateTagButtons();
+      });
+    </script>
+  `;
+}
+
 // HTMLテンプレート
 const htmlTemplate = `<!DOCTYPE html>
 <html lang="ja">
@@ -111,7 +360,7 @@ const htmlTemplate = `<!DOCTYPE html>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         .slide-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
         }
         .slide-card:hover {
             transform: translateY(-4px);
@@ -125,6 +374,18 @@ const htmlTemplate = `<!DOCTYPE html>
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
+        }
+        .tag-filter-btn.active {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+        .tag-filter-btn {
+            border-color: #d1d5db;
+            color: #374151;
+        }
+        .tag-filter-btn:hover:not(.active) {
+            background-color: #f9fafb;
         }
     </style>
 </head>
@@ -182,12 +443,14 @@ const htmlTemplate = `<!DOCTYPE html>
             </div>
         </section>
 
+        ${generateSearchUI()}
+
         <!-- スライド一覧 -->
-        <section>
+        <section id="slidesSection">
             <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">
                 📚 Available Presentations
             </h2>
-            <div class="grid md:grid-cols-2 gap-8">
+            <div class="grid md:grid-cols-2 gap-8" id="slidesContainer">
                 ${slides.map(generateSlideCard).join('')}
             </div>
         </section>
@@ -235,6 +498,8 @@ const htmlTemplate = `<!DOCTYPE html>
             </p>
         </div>
     </footer>
+
+    ${generateSearchScript()}
 </body>
 </html>`;
 
