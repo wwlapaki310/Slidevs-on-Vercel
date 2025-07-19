@@ -1,24 +1,33 @@
 {
   "name": "my-slidev-presentations",
-  "version": "1.0.0",
+  "version": "1.1.0",
+  "description": "A system for managing multiple Slidev presentations in one repository",
   "type": "module",
-  "private": true,
   "scripts": {
-    "build": "npm run build:slides && npm run build:index && npm run build:previews",
-    "build:slides": "npm run build:sre-next-2025 && npm run build:slidev-system",
-    "build:sre-next-2025": "cd slides/sre-next-2025/src && npm install && npm run build",
-    "build:slidev-system": "cd slides/slidev-system/src && npm install && npm run build",
+    "build": "npm run build:slidev-system && npm run build:index",
+    "build:slidev-system": "cd slides/slidev-system/src && npm run build",
     "build:index": "node scripts/build-index.js",
-    "build:previews": "node scripts/generate-previews.js --production",
-    "generate-previews": "node scripts/generate-previews.js",
-    "generate-previews:dev": "node scripts/generate-previews.js --with-server",
-    "generate-previews:local": "npm run build:slides && npm run generate-previews:dev",
-    "update-previews": "npm run generate-previews:local && git add dist/previews/ && git commit -m '🖼️ Update preview images' && git push",
+    "dev:slidev-system": "cd slides/slidev-system/src && npm run dev",
     "create-slide": "node scripts/create-slide.js",
-    "dev:sre-next-2025": "cd slides/sre-next-2025/src && npm run dev",
-    "dev:slidev-system": "cd slides/slidev-system/src && npm run dev"
+    "generate-previews": "node scripts/generate-previews.js"
+  },
+  "keywords": [
+    "slidev",
+    "presentation",
+    "vercel",
+    "vue",
+    "markdown",
+    "slides",
+    "pnpm-workspace",
+    "multi-presentation"
+  ],
+  "author": "Open Source Community",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wwlapaki310/my-slidev-presentations"
   },
   "devDependencies": {
-    "playwright-chromium": "^1.45.1"
+    "playwright-chromium": "^1.40.0"
   }
 }
