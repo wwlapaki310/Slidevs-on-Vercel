@@ -1,6 +1,5 @@
 {
   "name": "slidev-system",
-  "type": "module",
   "private": true,
   "scripts": {
     "build": "slidev build --base /slidev-system/ --out ../../../dist/slidev-system",
@@ -8,11 +7,7 @@
     "export": "slidev export"
   },
   "dependencies": {
-    "@slidev/cli": "52.0.0",
-    "@slidev/theme-default": "latest",
-    "vue": "^3.4.31"
-  },
-  "devDependencies": {
-    "playwright-chromium": "^1.45.1"
+    "@slidev/cli": "^0.52.0",
+    "@slidev/theme-default": "latest"
   }
 }
