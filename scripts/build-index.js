@@ -1,315 +1,288 @@
 import fs from 'fs';
 import path from 'path';
 
-// スライド情報の設定（直接定義に戻す）
-const slideMetadata = [
-  {
-    name: 'sre-next-2025',
-    title: 'SRE NEXT 2025 - NoCスタッフ体験記',
-    description: 'SRE NEXT 2025でNoCスタッフをやった話とSRE NEXTの講演紹介',
-    date: '2025-07-17',
-    author: 'Satoru Akita',
-    tags: ['SRE', 'NoC', 'Infrastructure', 'Conference'],
-    category: 'tech-talk',
-    duration: '15分',
-    level: 'intermediate',
-    language: 'ja'
-  },
-  {
-    name: 'slidev-system',
-    title: 'Slidev × Vercel 複数スライド管理システム',
-    description: '1つのリポジトリで複数のSlidevプレゼンテーションを効率的に管理する仕組みの解説',
-    date: '2025-07-18',
-    author: 'Satoru Akita',
-    tags: ['Slidev', 'Vercel', 'DevOps', 'Automation'],
-    category: 'system-design',
-    duration: '20分',
-    level: 'beginner',
-    language: 'ja'
-  }
-];
+// JSONファイルからメタデータを読み込み
+function loadSlideMetadata() {
+    try {
+        const metadataPath = path.join(process.cwd(), 'scripts', 'slide-metadata.json');
+        const rawData = fs.readFileSync(metadataPath, 'utf8');
+        const metadata = JSON.parse(rawData);
+        
+        console.log(`📚 Loaded ${metadata.slides.length} slides from metadata file`);
+        return metadata;
+    } catch (error) {
+        console.error('❌ Error loading slide metadata:', error.message);
+        // フォールバック: 空のデータを返す
+        return {
+            slides: [],
+            tagCategories: {},
+            metadata: { version: "1.0.0", lastUpdated: new Date().toISOString(), totalSlides: 0 }
+        };
+    }
+}
 
-// タグカテゴリとメタデータ
-const tagCategories = {
-  technology: {
-    name: '技術',
-    tags: ['Slidev', 'Vercel', 'Vue.js', 'JavaScript', 'TypeScript', 'Node.js'],
-    color: 'blue'
-  },
-  domain: {
-    name: '分野',
-    tags: ['SRE', 'DevOps', 'Infrastructure', 'Frontend', 'Backend'],
-    color: 'green'
-  },
-  event: {
-    name: 'イベント',
-    tags: ['Conference', 'LT', 'Meetup', 'Workshop'],
-    color: 'purple'
-  },
-  format: {
-    name: '形式',
-    tags: ['Tutorial', 'Automation', 'NoC', 'Demo'],
-    color: 'orange'
-  }
-};
+// メタデータをロード
+const slideData = loadSlideMetadata();
+const slideMetadata = slideData.slides;
+const tagCategories = slideData.tagCategories;
 
 /**
  * 全タグを抽出する
  */
 function extractAllTags(slides = slideMetadata) {
-  const allTags = new Set();
-  slides.forEach(slide => {
-    slide.tags.forEach(tag => allTags.add(tag));
-  });
-  return Array.from(allTags).sort();
+    const allTags = new Set();
+    slides.forEach(slide => {
+        slide.tags.forEach(tag => allTags.add(tag));
+    });
+    return Array.from(allTags).sort();
 }
 
 /**
  * 検索UIのHTMLを生成する
  */
 function generateSearchUI() {
-  const allTags = extractAllTags(slideMetadata);
-  
-  return `
+    const allTags = extractAllTags(slideMetadata);
+    
+    return `
     <!-- 検索・フィルタセクション -->
     <section class="mb-8">
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div class="max-w-4xl mx-auto">
-          <!-- タグ管理へのリンク -->
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-lg font-semibold text-gray-800">🔍 検索・フィルタ</h2>
-            <a href="/manage-tags.html" 
-               class="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full hover:bg-blue-200 transition-colors">
-              🏷️ タグ管理
-            </a>
-          </div>
-          
-          <!-- 検索ボックス -->
-          <div class="mb-6">
-            <div class="relative">
-              <input 
-                type="text" 
-                id="searchInput" 
-                placeholder="タグ、タイトル、内容で検索（例：SRE, Vercel, DevOps）..."
-                class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              />
-              <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-              </svg>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="max-w-4xl mx-auto">
+                <!-- タグ管理へのリンク -->
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold text-gray-800">🔍 検索・フィルタ</h2>
+                    <a href="/manage-tags.html" 
+                       class="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full hover:bg-blue-200 transition-colors">
+                        🏷️ タグ管理
+                    </a>
+                </div>
+                
+                <!-- 検索ボックス -->
+                <div class="mb-6">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            placeholder="タグ、タイトル、内容で検索（例：SRE, Vercel, DevOps）..."
+                            class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        />
+                        <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                
+                <!-- タグフィルタ -->
+                <div class="mb-4">
+                    <div class="flex flex-wrap gap-2 mb-3" id="tagContainer">
+                        <button class="tag-filter-btn active px-4 py-2 rounded-full text-sm font-medium transition-colors border" data-tag="all">
+                            すべて (${slideMetadata.length})
+                        </button>
+                        ${allTags.map(tag => {
+                            const count = slideMetadata.filter(slide => slide.tags.includes(tag)).length;
+                            return `
+                                <button class="tag-filter-btn px-3 py-1 rounded-full text-xs font-medium transition-colors border" data-tag="${tag}">
+                                    ${tag} (${count})
+                                </button>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+                
+                <!-- 検索結果表示 -->
+                <div id="searchResults" class="text-sm text-gray-600 flex items-center justify-between">
+                    <span><span id="resultCount">${slideMetadata.length}</span> 件のプレゼンテーションが見つかりました</span>
+                    <button id="clearFilters" class="text-blue-600 hover:text-blue-800 font-medium" style="display: none;">フィルタをクリア</button>
+                </div>
             </div>
-          </div>
-          
-          <!-- タグフィルタ -->
-          <div class="mb-4">
-            <div class="flex flex-wrap gap-2 mb-3" id="tagContainer">
-              <button class="tag-filter-btn active px-4 py-2 rounded-full text-sm font-medium transition-colors border" data-tag="all">
-                すべて (${slideMetadata.length})
-              </button>
-              ${allTags.map(tag => {
-                const count = slideMetadata.filter(slide => slide.tags.includes(tag)).length;
-                return `
-                  <button class="tag-filter-btn px-3 py-1 rounded-full text-xs font-medium transition-colors border" data-tag="${tag}">
-                    ${tag} (${count})
-                  </button>
-                `;
-              }).join('')}
-            </div>
-          </div>
-          
-          <!-- 検索結果表示 -->
-          <div id="searchResults" class="text-sm text-gray-600 flex items-center justify-between">
-            <span><span id="resultCount">${slideMetadata.length}</span> 件のプレゼンテーションが見つかりました</span>
-            <button id="clearFilters" class="text-blue-600 hover:text-blue-800 font-medium" style="display: none;">フィルタをクリア</button>
-          </div>
         </div>
-      </div>
     </section>
-  `;
+    `;
 }
 
 /**
  * スライドカードのHTMLを生成する
  */
 function generateSlideCard(slide) {
-  return `
+    return `
     <div class="slide-card bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden" 
          data-tags="${slide.tags.join(',')}" 
          data-title="${slide.title}" 
          data-description="${slide.description}">
       
-      <a href="/${slide.name}/" class="block">
-        <div class="h-48 relative overflow-hidden bg-gray-100 cursor-pointer">
-          <img 
-            src="/previews/${slide.name}.png" 
-            alt="${slide.title} - Preview"
-            class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-            loading="lazy"
-            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-          />
-          
-          <div class="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center" style="display: none;">
-            <div class="text-center text-white">
-              <div class="text-4xl mb-2">🎯</div>
-              <div class="text-lg font-semibold px-4">${slide.title}</div>
+        <a href="/${slide.name}/" class="block">
+            <div class="h-48 relative overflow-hidden bg-gray-100 cursor-pointer">
+                <img 
+                    src="/previews/${slide.name}.png" 
+                    alt="${slide.title} - Preview"
+                    class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                    loading="lazy"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                />
+                
+                <div class="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center" style="display: none;">
+                    <div class="text-center text-white">
+                        <div class="text-4xl mb-2">🎯</div>
+                        <div class="text-lg font-semibold px-4">${slide.title}</div>
+                    </div>
+                </div>
+                
+                <div class="absolute top-4 right-4 bg-white bg-opacity-90 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
+                    ${new Date(slide.date).toLocaleDateString('ja-JP')}
+                </div>
+                
+                <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
+                    <div class="text-white text-center">
+                        <svg class="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                        </svg>
+                        <div class="text-sm font-medium">スライドを見る</div>
+                    </div>
+                </div>
             </div>
-          </div>
-          
-          <div class="absolute top-4 right-4 bg-white bg-opacity-90 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
-            ${new Date(slide.date).toLocaleDateString('ja-JP')}
-          </div>
-          
-          <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100">
-            <div class="text-white text-center">
-              <svg class="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
-              </svg>
-              <div class="text-sm font-medium">スライドを見る</div>
+        </a>
+        
+        <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-3">${slide.title}</h3>
+            <p class="text-gray-600 mb-4 line-clamp-3">${slide.description}</p>
+            
+            <div class="flex flex-wrap gap-2 mb-4">
+                ${slide.tags.map(tag => `
+                    <span class="slide-tag px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full cursor-pointer hover:bg-blue-200 transition-colors" data-tag="${tag}">
+                        ${tag}
+                    </span>
+                `).join('')}
             </div>
-          </div>
+            
+            <div class="flex gap-3">
+                <a href="/${slide.name}/" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-center hover:bg-blue-700 transition-colors">
+                    スライドを見る
+                </a>
+                <a href="/${slide.name}/presenter/" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors" title="発表者モード">
+                    🎤
+                </a>
+                <a href="/${slide.name}/overview/" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors" title="概要モード">
+                    📋
+                </a>
+            </div>
         </div>
-      </a>
-      
-      <div class="p-6">
-        <h3 class="text-xl font-bold text-gray-800 mb-3">${slide.title}</h3>
-        <p class="text-gray-600 mb-4 line-clamp-3">${slide.description}</p>
-        
-        <div class="flex flex-wrap gap-2 mb-4">
-          ${slide.tags.map(tag => `
-            <span class="slide-tag px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full cursor-pointer hover:bg-blue-200 transition-colors" data-tag="${tag}">
-              ${tag}
-            </span>
-          `).join('')}
-        </div>
-        
-        <div class="flex gap-3">
-          <a href="/${slide.name}/" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-center hover:bg-blue-700 transition-colors">
-            スライドを見る
-          </a>
-          <a href="/${slide.name}/presenter/" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors" title="発表者モード">
-            🎤
-          </a>
-          <a href="/${slide.name}/overview/" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors" title="概要モード">
-            📋
-          </a>
-        </div>
-      </div>
     </div>
-  `;
+    `;
 }
 
 /**
  * 検索・フィルタリング用JavaScriptを生成する
  */
 function generateSearchScript() {
-  return `
+    return `
     <script>
-      const slidesData = ${JSON.stringify(slideMetadata)};
-      const searchInput = document.getElementById('searchInput');
-      const tagFilterBtns = document.querySelectorAll('.tag-filter-btn');
-      const slideCards = document.querySelectorAll('.slide-card');
-      const resultCount = document.getElementById('resultCount');
-      const slideTags = document.querySelectorAll('.slide-tag');
-      const clearFilters = document.getElementById('clearFilters');
-      
-      let currentFilter = { tags: [], searchText: '' };
-      
-      function applyFilters() {
-        let visibleCount = 0;
+        const slidesData = ${JSON.stringify(slideMetadata)};
+        const searchInput = document.getElementById('searchInput');
+        const tagFilterBtns = document.querySelectorAll('.tag-filter-btn');
+        const slideCards = document.querySelectorAll('.slide-card');
+        const resultCount = document.getElementById('resultCount');
+        const slideTags = document.querySelectorAll('.slide-tag');
+        const clearFilters = document.getElementById('clearFilters');
         
-        slideCards.forEach(card => {
-          const cardTags = card.dataset.tags.split(',');
-          const cardTitle = card.dataset.title.toLowerCase();
-          const cardDescription = card.dataset.description.toLowerCase();
-          const searchText = currentFilter.searchText.toLowerCase();
-          
-          const tagMatch = currentFilter.tags.length === 0 || 
-                          currentFilter.tags.includes('all') ||
-                          currentFilter.tags.some(filterTag => cardTags.includes(filterTag));
-          
-          const textMatch = !searchText || 
-                           cardTags.some(tag => tag.toLowerCase().includes(searchText)) ||
-                           cardTitle.includes(searchText) ||
-                           cardDescription.includes(searchText);
-          
-          if (tagMatch && textMatch) {
-            card.style.display = 'block';
-            visibleCount++;
-          } else {
-            card.style.display = 'none';
-          }
+        let currentFilter = { tags: [], searchText: '' };
+        
+        function applyFilters() {
+            let visibleCount = 0;
+            
+            slideCards.forEach(card => {
+                const cardTags = card.dataset.tags.split(',');
+                const cardTitle = card.dataset.title.toLowerCase();
+                const cardDescription = card.dataset.description.toLowerCase();
+                const searchText = currentFilter.searchText.toLowerCase();
+                
+                const tagMatch = currentFilter.tags.length === 0 || 
+                                currentFilter.tags.includes('all') ||
+                                currentFilter.tags.some(filterTag => cardTags.includes(filterTag));
+                
+                const textMatch = !searchText || 
+                                 cardTags.some(tag => tag.toLowerCase().includes(searchText)) ||
+                                 cardTitle.includes(searchText) ||
+                                 cardDescription.includes(searchText);
+                
+                if (tagMatch && textMatch) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            resultCount.textContent = visibleCount;
+            
+            const hasFilters = currentFilter.tags.length > 0 || currentFilter.searchText;
+            clearFilters.style.display = hasFilters ? 'inline-block' : 'none';
+        }
+        
+        function updateTagButtons() {
+            tagFilterBtns.forEach(btn => {
+                const tag = btn.dataset.tag;
+                if (currentFilter.tags.includes(tag) || (currentFilter.tags.length === 0 && tag === 'all')) {
+                    btn.classList.add('active');
+                    btn.classList.remove('border-gray-300', 'text-gray-700');
+                    btn.classList.add('border-blue-500', 'bg-blue-500', 'text-white');
+                } else {
+                    btn.classList.remove('active');
+                    btn.classList.remove('border-blue-500', 'bg-blue-500', 'text-white');
+                    btn.classList.add('border-gray-300', 'text-gray-700');
+                }
+            });
+        }
+        
+        searchInput.addEventListener('input', (e) => {
+            currentFilter.searchText = e.target.value;
+            applyFilters();
         });
         
-        resultCount.textContent = visibleCount;
-        
-        const hasFilters = currentFilter.tags.length > 0 || currentFilter.searchText;
-        clearFilters.style.display = hasFilters ? 'inline-block' : 'none';
-      }
-      
-      function updateTagButtons() {
         tagFilterBtns.forEach(btn => {
-          const tag = btn.dataset.tag;
-          if (currentFilter.tags.includes(tag) || (currentFilter.tags.length === 0 && tag === 'all')) {
-            btn.classList.add('active');
-            btn.classList.remove('border-gray-300', 'text-gray-700');
-            btn.classList.add('border-blue-500', 'bg-blue-500', 'text-white');
-          } else {
-            btn.classList.remove('active');
-            btn.classList.remove('border-blue-500', 'bg-blue-500', 'text-white');
-            btn.classList.add('border-gray-300', 'text-gray-700');
-          }
+            btn.addEventListener('click', (e) => {
+                const tag = e.target.dataset.tag;
+                
+                if (tag === 'all') {
+                    currentFilter.tags = [];
+                } else {
+                    if (currentFilter.tags.includes(tag)) {
+                        currentFilter.tags = currentFilter.tags.filter(t => t !== tag);
+                    } else {
+                        currentFilter.tags.push(tag);
+                        currentFilter.tags = currentFilter.tags.filter(t => t !== 'all');
+                    }
+                }
+                
+                updateTagButtons();
+                applyFilters();
+            });
         });
-      }
-      
-      searchInput.addEventListener('input', (e) => {
-        currentFilter.searchText = e.target.value;
-        applyFilters();
-      });
-      
-      tagFilterBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const tag = e.target.dataset.tag;
-          
-          if (tag === 'all') {
-            currentFilter.tags = [];
-          } else {
-            if (currentFilter.tags.includes(tag)) {
-              currentFilter.tags = currentFilter.tags.filter(t => t !== tag);
-            } else {
-              currentFilter.tags.push(tag);
-              currentFilter.tags = currentFilter.tags.filter(t => t !== 'all');
-            }
-          }
-          
-          updateTagButtons();
-          applyFilters();
+        
+        slideTags.forEach(tag => {
+            tag.addEventListener('click', (e) => {
+                e.preventDefault();
+                const tagName = e.target.dataset.tag;
+                
+                if (!currentFilter.tags.includes(tagName)) {
+                    currentFilter.tags = [tagName];
+                    updateTagButtons();
+                    applyFilters();
+                }
+            });
         });
-      });
-      
-      slideTags.forEach(tag => {
-        tag.addEventListener('click', (e) => {
-          e.preventDefault();
-          const tagName = e.target.dataset.tag;
-          
-          if (!currentFilter.tags.includes(tagName)) {
-            currentFilter.tags = [tagName];
+        
+        clearFilters.addEventListener('click', () => {
+            currentFilter = { tags: [], searchText: '' };
+            searchInput.value = '';
             updateTagButtons();
             applyFilters();
-          }
         });
-      });
-      
-      clearFilters.addEventListener('click', () => {
-        currentFilter = { tags: [], searchText: '' };
-        searchInput.value = '';
-        updateTagButtons();
-        applyFilters();
-      });
-      
-      document.addEventListener('DOMContentLoaded', () => {
-        updateTagButtons();
-      });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTagButtons();
+        });
     </script>
-  `;
+    `;
 }
 
 // HTMLテンプレート
@@ -453,6 +426,9 @@ const htmlTemplate = `<!DOCTYPE html>
         <div class="max-w-6xl mx-auto px-4 text-center">
             <p class="text-gray-300">Built with ❤️ using Slidev + Vercel + pnpm workspace</p>
             <p class="text-gray-400 text-sm mt-2">© 2025 Satoru Akita. All rights reserved.</p>
+            <div class="text-xs text-gray-500 mt-2">
+                Metadata version: ${slideData.metadata.version} | Last updated: ${new Date(slideData.metadata.lastUpdated).toLocaleDateString('ja-JP')}
+            </div>
         </div>
     </footer>
 
@@ -477,6 +453,10 @@ function generateIndexPage() {
     slideMetadata.forEach(slide => {
         console.log(`   - ${slide.title} (/${slide.name}/) - Preview: previews/${slide.name}.png`);
     });
+    
+    // メタデータ情報も表示
+    console.log(`📋 Metadata version: ${slideData.metadata.version}`);
+    console.log(`🕒 Last updated: ${slideData.metadata.lastUpdated}`);
 }
 
 // スクリプト実行
@@ -484,4 +464,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     generateIndexPage();
 }
 
-export { generateIndexPage, slideMetadata };
+export { generateIndexPage, slideMetadata, tagCategories };
