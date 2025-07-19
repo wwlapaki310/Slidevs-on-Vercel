@@ -1,7 +1,7 @@
 import { chromium } from 'playwright-chromium';
 import fs from 'fs';
 import path from 'path';
-import { slides } from './build-index.js';
+import { slideMetadata } from './build-index.js';
 
 /**
  * スライドのプレビュー画像を生成する
@@ -21,7 +21,7 @@ async function generatePreviews() {
   if (isProduction) {
     console.log('🏭 Production environment detected');
     // 本番環境では軽量なフォールバック画像のみ生成
-    for (const slide of slides) {
+    for (const slide of slideMetadata) {
       await generateFallbackImage(slide.name, previewsDir);
     }
     return;
@@ -48,7 +48,7 @@ async function generatePreviews() {
       viewport: { width: 1280, height: 720 }
     });
 
-    for (const slide of slides) {
+    for (const slide of slideMetadata) {
       try {
         console.log(`📸 Capturing preview for: ${slide.name}`);
         
@@ -92,7 +92,7 @@ async function generatePreviews() {
     console.error('❌ Failed to initialize browser:', error);
     
     // 全スライドでフォールバック画像を生成
-    for (const slide of slides) {
+    for (const slide of slideMetadata) {
       await generateFallbackImage(slide.name, previewsDir);
     }
     
@@ -112,7 +112,7 @@ async function generateFallbackImage(slideName, previewsDir) {
   console.log(`🎨 Generating fallback image for: ${slideName}`);
   
   // スライド情報を取得
-  const slide = slides.find(s => s.name === slideName);
+  const slide = slideMetadata.find(s => s.name === slideName);
   const title = slide ? slide.title : slideName;
   const description = slide ? slide.description : 'Slidev Presentation';
   
@@ -164,7 +164,7 @@ async function generateProductionPreviews() {
     fs.mkdirSync(previewsDir, { recursive: true });
   }
   
-  for (const slide of slides) {
+  for (const slide of slideMetadata) {
     await generateFallbackImage(slide.name, previewsDir);
   }
   
