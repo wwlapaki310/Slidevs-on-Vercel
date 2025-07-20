@@ -1,6 +1,9 @@
-# My Slidev Presentations
+# Slidevs-on-Vercel 
 
-🎪 **A system for managing multiple Slidev presentations in one repository**
+📚 **Write slides in Markdown. Host them on the Web. All from one Git repo.**
+
+Manage and publish multiple Slidev presentations with Vercel —  
+auto-deployed, shareable, and beautifully simple.
 
 This project demonstrates how to efficiently manage multiple [Slidev](https://sli.dev/) presentations within a single repository using pnpm workspace and automated deployment with Vercel.
 
