@@ -1,6 +1,7 @@
 {
-  "installCommand": "pnpm install",
+  "installCommand": "pnpm install --frozen-lockfile=false",
   "buildCommand": "pnpm build",
+  "outputDirectory": "dist",
   "rewrites": [
     { "source": "/slidev-system/:path*", "destination": "/slidev-system/:path*" },
     { "source": "/slidev-system-zh/:path*", "destination": "/slidev-system-zh/:path*" },
