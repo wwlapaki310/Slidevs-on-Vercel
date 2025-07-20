@@ -3,18 +3,40 @@
     {
       "name": "slidev-system",
       "title": "Slidev × Vercel Multi-Slide Management System",
-      "description": "A system for efficiently managing multiple Slidev presentations in one repository",
+      "description": "A comprehensive system for efficiently managing multiple Slidev presentations in one repository",
       "date": "2025-07-19",
       "author": "Slidev Community",
       "category": "system-design",
       "duration": "20 min",
       "level": "beginner",
       "language": "en"
+    },
+    {
+      "name": "slidev-system-ja",
+      "title": "Slidev × Vercel マルチスライド管理システム",
+      "description": "一つのリポジトリで複数のSlidevプレゼンテーションを効率的に管理するための包括的なシステム",
+      "date": "2025-07-19",
+      "author": "Slidev コミュニティ",
+      "category": "system-design",
+      "duration": "20分",
+      "level": "初級",
+      "language": "ja"
+    },
+    {
+      "name": "slidev-system-zh",
+      "title": "Slidev × Vercel 多幻灯片管理系统",
+      "description": "在一个仓库中高效管理多个Slidev演示文稿的综合系统",
+      "date": "2025-07-19",
+      "author": "Slidev 社区",
+      "category": "system-design",
+      "duration": "20分钟",
+      "level": "初级",
+      "language": "zh"
     }
   ],
   "metadata": {
     "version": "1.1.0",
-    "lastUpdated": "2025-07-19T16:10:00Z",
-    "totalSlides": 1
+    "lastUpdated": "2025-07-20T03:35:00Z",
+    "totalSlides": 3
   }
 }
