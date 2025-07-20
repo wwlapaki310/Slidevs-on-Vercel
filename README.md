@@ -11,8 +11,8 @@ This project demonstrates how to efficiently manage multiple [Slidev](https://sl
 
 ## 🌐 Live Demo
 
-- **Main Site**: https://my-slidev-eight.vercel.app/
-- **Slidev System Demo**: https://my-slidev-eight.vercel.app/slidev-system/
+- **Main Site**: *To be updated with new Vercel URL*
+- **Slidev System Demo**: *To be updated with new Vercel URL/slidev-system/*
 
 ## ✨ Features
 
@@ -26,7 +26,7 @@ This project demonstrates how to efficiently manage multiple [Slidev](https://sl
 ## 🏗️ Architecture
 
 ```
-my-slidev-presentations/
+Slidevs-on-Vercel/
 ├── slides/
 │   └── slidev-system/           # Presentation: System Overview
 │       └── src/
@@ -53,8 +53,8 @@ my-slidev-presentations/
 
 ```bash
 # Clone the repository
-git clone https://github.com/wwlapaki310/my-slidev-presentations.git
-cd my-slidev-presentations
+git clone https://github.com/wwlapaki310/Slidevs-on-Vercel.git
+cd Slidevs-on-Vercel
 
 # Install dependencies
 pnpm install
