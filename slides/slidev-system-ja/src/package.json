@@ -1,0 +1,13 @@
+{
+  "name": "slidev-system-ja",
+  "private": true,
+  "scripts": {
+    "build": "slidev build --base /slidev-system-ja/ --out ../../../dist/slidev-system-ja",
+    "dev": "slidev --open",
+    "export": "slidev export"
+  },
+  "dependencies": {
+    "@slidev/cli": "52.0.0",
+    "@slidev/theme-default": "latest"
+  }
+}
