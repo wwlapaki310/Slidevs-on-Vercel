@@ -1,4 +1,4 @@
-# My Slidev Presentations
+# Slidevs-on-Vercel
 
 🎪 **単一リポジトリで複数のSlidevプレゼンテーションを管理するシステム**
 
@@ -8,10 +8,10 @@
 
 ## 🌐 ライブデモ
 
-- **メインサイト**: https://my-slidev-eight.vercel.app/
-- **Slidev システムデモ（英語）**: https://my-slidev-eight.vercel.app/slidev-system/
-- **Slidev システムデモ（中文）**: https://my-slidev-eight.vercel.app/slidev-system-zh/
-- **Slidev システムデモ（日本語）**: https://my-slidev-eight.vercel.app/slidev-system-ja/
+- **メインサイト**: *新しいVercel URLに更新予定*
+- **Slidev システムデモ（英語）**: *新しいVercel URL/slidev-system/ に更新予定*
+- **Slidev システムデモ（中文）**: *新しいVercel URL/slidev-system-zh/ に更新予定*
+- **Slidev システムデモ（日本語）**: *新しいVercel URL/slidev-system-ja/ に更新予定*
 
 ## ✨ 機能
 
@@ -26,7 +26,7 @@
 ## 🏗️ アーキテクチャ
 
 ```
-my-slidev-presentations/
+Slidevs-on-Vercel/
 ├── slides/
 │   ├── slidev-system/           # プレゼンテーション: システム概要（英語）
 │   │   └── src/
@@ -57,8 +57,8 @@ my-slidev-presentations/
 
 ```bash
 # リポジトリをクローン
-git clone https://github.com/wwlapaki310/my-slidev-presentations.git
-cd my-slidev-presentations
+git clone https://github.com/wwlapaki310/Slidevs-on-Vercel.git
+cd Slidevs-on-Vercel
 
 # 依存関係をインストール
 pnpm install
