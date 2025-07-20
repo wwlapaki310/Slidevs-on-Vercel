@@ -12,7 +12,8 @@
     "dev:slidev-system": "cd slides/slidev-system/src && npm run dev",
     "dev:slidev-system-zh": "cd slides/slidev-system-zh/src && npm run dev",
     "dev:slidev-system-ja": "cd slides/slidev-system-ja/src && npm run dev",
-    "create-slide": "node scripts/create-slide.js"
+    "create-slide": "node scripts/create-slide.js",
+    "install:all": "npm install && cd slides/slidev-system/src && npm install && cd ../../slidev-system-zh/src && npm install && cd ../../slidev-system-ja/src && npm install"
   },
   "keywords": [
     "slidev",
