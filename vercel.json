@@ -1,4 +1,6 @@
 {
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm build",
   "rewrites": [
     { "source": "/slidev-system/:path*", "destination": "/slidev-system/:path*" },
     { "source": "/slidev-system-zh/:path*", "destination": "/slidev-system-zh/:path*" },
