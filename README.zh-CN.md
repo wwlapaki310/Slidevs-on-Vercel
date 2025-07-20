@@ -1,4 +1,4 @@
-# My Slidev Presentations
+# Slidevs-on-Vercel
 
 🎪 **在单个仓库中管理多个 Slidev 演示文稿的系统**
 
@@ -8,8 +8,8 @@
 
 ## 🌐 在线演示
 
-- **主站**: https://my-slidev-eight.vercel.app/
-- **Slidev 系统演示**: https://my-slidev-eight.vercel.app/slidev-system/
+- **主站**: *待更新至新的 Vercel URL*
+- **Slidev 系统演示**: *待更新至新的 Vercel URL/slidev-system/*
 
 ## ✨ 功能特性
 
@@ -23,7 +23,7 @@
 ## 🏗️ 架构
 
 ```
-my-slidev-presentations/
+Slidevs-on-Vercel/
 ├── slides/
 │   └── slidev-system/           # 演示文稿: 系统概述
 │       └── src/
@@ -50,8 +50,8 @@ my-slidev-presentations/
 
 ```bash
 # 克隆仓库
-git clone https://github.com/wwlapaki310/my-slidev-presentations.git
-cd my-slidev-presentations
+git clone https://github.com/wwlapaki310/Slidevs-on-Vercel.git
+cd Slidevs-on-Vercel
 
 # 安装依赖
 pnpm install
