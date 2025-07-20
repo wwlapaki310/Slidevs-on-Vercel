@@ -8,6 +8,6 @@
   },
   "dependencies": {
     "@slidev/cli": "^0.52.0",
-    "@slidev/theme-default": "latest"
+    "@slidev/theme-default": "^0.25.0"
   }
 }
