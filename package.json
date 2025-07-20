@@ -12,8 +12,7 @@
     "dev:slidev-system": "cd slides/slidev-system/src && npm run dev",
     "dev:slidev-system-zh": "cd slides/slidev-system-zh/src && npm run dev",
     "dev:slidev-system-ja": "cd slides/slidev-system-ja/src && npm run dev",
-    "create-slide": "node scripts/create-slide.js",
-    "generate-previews": "node scripts/generate-previews.js"
+    "create-slide": "node scripts/create-slide.js"
   },
   "keywords": [
     "slidev",
@@ -32,8 +31,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/wwlapaki310/my-slidev-presentations"
-  },
-  "devDependencies": {
-    "playwright-chromium": "^1.40.0"
   }
 }
