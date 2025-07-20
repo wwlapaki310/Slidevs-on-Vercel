@@ -1,2 +1,4 @@
 packages:
-  - "slides/*/src"
+  - "slides/slidev-system/src"
+  - "slides/slidev-system-zh/src"  
+  - "slides/slidev-system-ja/src"
