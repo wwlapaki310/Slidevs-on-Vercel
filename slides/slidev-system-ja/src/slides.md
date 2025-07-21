@@ -30,7 +30,7 @@ mdc: true
   <button @click="$slidev.nav.openInEditor()" title="エディターで開く" class="text-xl slidev-icon-btn opacity-50 !border-none !hover:text-white">
     <carbon:edit />
   </button>
-  <a href="https://github.com/wwlapaki310/my-slidev-presentations" target="_blank" alt="GitHub" title="GitHubで開く"
+  <a href="https://github.com/wwlapaki310/Slidevs-on-Vercel" target="_blank" alt="GitHub" title="GitHubで開く"
     class="text-xl slidev-icon-btn opacity-50 !border-none !hover:text-white">
     <carbon-logo-github />
   </a>
@@ -70,21 +70,21 @@ transition: fade-out
 graph TD
     A[GitHub リポジトリ] --> B[pnpm ワークスペース]
     
-    B --> C1[getting-started/src/]
+    B --> C1[slidev-system-ja/src/]
     B --> C2[slidev-system/src/]
-    B --> C3[future-slides/src/]
+    B --> C3[slidev-system-zh/src/]
     
-    C1 --> D1[ビルド: /getting-started/]
+    C1 --> D1[ビルド: /slidev-system-ja/]
     C2 --> D2[ビルド: /slidev-system/]
-    C3 --> D3[ビルド: /future-slides/]
+    C3 --> D3[ビルド: /slidev-system-zh/]
     
     D1 --> E[Vercel 統合デプロイ]
     D2 --> E
     D3 --> E
     
-    E --> F1[https://domain.com/getting-started/]
+    E --> F1[https://domain.com/slidev-system-ja/]
     E --> F2[https://domain.com/slidev-system/]
-    E --> F3[https://domain.com/future-slides/]
+    E --> F3[https://domain.com/slidev-system-zh/]
     E --> F4[https://domain.com/ - ランディングページ]
     
     style A fill:#e1f5fe
@@ -99,19 +99,25 @@ graph TD
 実際のディレクトリ構造とファイル配置
 
 ```
-my-slidev-presentations/
+Slidevs-on-Vercel/
 ├── pnpm-workspace.yaml          # ワークスペース設定
 ├── package.json                 # ルートパッケージ管理
 ├── vercel.json                  # デプロイ・ルーティング設定
 ├── 
 ├── slides/                      # 全プレゼンテーションディレクトリ
-│   └── slidev-system/           # システム概要プレゼンテーション
+│   ├── slidev-system-ja/        # 日本語システム概要プレゼンテーション
+│   │   └── src/
+│   │       ├── slides.md        # このスライドの内容！
+│   │       └── package.json     # 個別ビルド設定
+│   ├── slidev-system/           # 英語システム概要プレゼンテーション
+│   │   └── src/
+│   └── slidev-system-zh/        # 中国語システム概要プレゼンテーション
 │       └── src/
-│           ├── slides.md        # このスライドの内容！
-│           └── package.json     # 個別ビルド設定
 │
 ├── dist/                        # ビルド成果物
-│   ├── slidev-system/           # ビルドされたプレゼンテーション
+│   ├── slidev-system-ja/        # ビルドされた日本語プレゼンテーション
+│   ├── slidev-system/           # ビルドされた英語プレゼンテーション
+│   ├── slidev-system-zh/        # ビルドされた中国語プレゼンテーション
 │   └── index.html               # 生成されたランディングページ
 │
 └── scripts/
@@ -176,9 +182,9 @@ packages:
 ## 個別スライドのpackage.json例
 ```json
 {
-  "name": "slidev-system",
+  "name": "slidev-system-ja",
   "scripts": {
-    "build": "slidev build --base /slidev-system/ --out ../../../dist/slidev-system"
+    "build": "slidev build --base /slidev-system-ja/ --out ../../../dist/slidev-system-ja"
   },
   "dependencies": {
     "@slidev/cli": "52.0.0",
@@ -207,18 +213,26 @@ packages:
 {
   "rewrites": [
     { 
+      "source": "/slidev-system-ja/:path*", 
+      "destination": "/slidev-system-ja/:path*" 
+    },
+    { 
       "source": "/slidev-system/:path*", 
       "destination": "/slidev-system/:path*" 
+    },
+    { 
+      "source": "/slidev-system-zh/:path*", 
+      "destination": "/slidev-system-zh/:path*" 
     }
   ]
 }
 ```
 
 ## URL 構造
-- `https://my-slidev-eight.vercel.app/` - ランディングページ
-- `https://my-slidev-eight.vercel.app/slidev-system/` - このプレゼンテーション
-- `https://my-slidev-eight.vercel.app/slidev-system/presenter/` - 発表者モード
-- `https://my-slidev-eight.vercel.app/slidev-system/overview/` - 概要モード
+- `https://slidevs-on-vercel.vercel.app/` - ランディングページ
+- `https://slidevs-on-vercel.vercel.app/slidev-system-ja/` - この日本語プレゼンテーション
+- `https://slidevs-on-vercel.vercel.app/slidev-system/` - 英語プレゼンテーション
+- `https://slidevs-on-vercel.vercel.app/slidev-system-zh/` - 中国語プレゼンテーション
 
 </v-clicks>
 
@@ -233,12 +247,14 @@ packages:
 ## ルート package.json
 ```json
 {
-  "name": "my-slidev-presentations",
+  "name": "Slidevs-on-Vercel",
   "scripts": {
-    "build": "npm run build:slidev-system && npm run build:index",
+    "build": "npm run build:slidev-system-ja && npm run build:slidev-system && npm run build:slidev-system-zh && npm run build:index",
+    "build:slidev-system-ja": "cd slides/slidev-system-ja/src && npm run build",
     "build:slidev-system": "cd slides/slidev-system/src && npm run build",
+    "build:slidev-system-zh": "cd slides/slidev-system-zh/src && npm run build",
     "build:index": "node scripts/build-index.js",
-    "dev:slidev-system": "cd slides/slidev-system/src && npm run dev"
+    "dev:slidev-system-ja": "cd slides/slidev-system-ja/src && npm run dev"
   }
 }
 ```
@@ -345,7 +361,7 @@ class: text-center
 </div>
 
 <div class="abs-br m-6 flex gap-2">
-  <a href="https://github.com/wwlapaki310/my-slidev-presentations" target="_blank" alt="GitHub" title="リポジトリを見る"
+  <a href="https://github.com/wwlapaki310/Slidevs-on-Vercel" target="_blank" alt="GitHub" title="リポジトリを見る"
     class="text-xl slidev-icon-btn opacity-50 !border-none !hover:text-white">
     <carbon-logo-github />
   </a>
