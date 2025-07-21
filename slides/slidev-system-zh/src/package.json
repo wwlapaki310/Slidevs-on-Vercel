@@ -2,7 +2,7 @@
   "name": "slidev-system-zh",
   "private": true,
   "scripts": {
-    "build": "slidev build --base /slidev-system-zh/ --out ../../../dist/slidev-system-zh",
+    "build": "slidev build --base /slidev-system-zh/ --out ../../../dist/slidev-system-zh --spa",
     "dev": "slidev --open",
     "export": "slidev export"
   },
