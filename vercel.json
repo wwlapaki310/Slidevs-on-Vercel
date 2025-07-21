@@ -3,8 +3,8 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/slidev-system/:path*", "destination": "/slidev-system/:path*" },
-    { "source": "/slidev-system-zh/:path*", "destination": "/slidev-system-zh/:path*" },
-    { "source": "/slidev-system-ja/:path*", "destination": "/slidev-system-ja/:path*" }
+    { "source": "/slidev-system/:path*", "destination": "/slidev-system/index.html" },
+    { "source": "/slidev-system-zh/:path*", "destination": "/slidev-system-zh/index.html" },
+    { "source": "/slidev-system-ja/:path*", "destination": "/slidev-system-ja/index.html" }
   ]
 }
