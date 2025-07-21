@@ -30,7 +30,7 @@ mdc: true
   <button @click="$slidev.nav.openInEditor()" title="Open in Editor" class="text-xl slidev-icon-btn opacity-50 !border-none !hover:text-white">
     <carbon:edit />
   </button>
-  <a href="https://github.com/wwlapaki310/my-slidev-presentations" target="_blank" alt="GitHub" title="Open in GitHub"
+  <a href="https://github.com/wwlapaki310/Slidevs-on-Vercel" target="_blank" alt="GitHub" title="Open in GitHub"
     class="text-xl slidev-icon-btn opacity-50 !border-none !hover:text-white">
     <carbon-logo-github />
   </a>
@@ -70,21 +70,21 @@ Efficiently manage multiple Slidev presentations in a single repository
 graph TD
     A[GitHub Repository] --> B[pnpm Workspace]
     
-    B --> C1[getting-started/src/]
+    B --> C1[slidev-system-ja/src/]
     B --> C2[slidev-system/src/]
-    B --> C3[future-slides/src/]
+    B --> C3[slidev-system-zh/src/]
     
-    C1 --> D1[Build: /getting-started/]
+    C1 --> D1[Build: /slidev-system-ja/]
     C2 --> D2[Build: /slidev-system/]
-    C3 --> D3[Build: /future-slides/]
+    C3 --> D3[Build: /slidev-system-zh/]
     
     D1 --> E[Vercel Unified Deploy]
     D2 --> E
     D3 --> E
     
-    E --> F1[https://domain.com/getting-started/]
+    E --> F1[https://domain.com/slidev-system-ja/]
     E --> F2[https://domain.com/slidev-system/]
-    E --> F3[https://domain.com/future-slides/]
+    E --> F3[https://domain.com/slidev-system-zh/]
     E --> F4[https://domain.com/ - Landing Page]
     
     style A fill:#e1f5fe
@@ -99,19 +99,27 @@ graph TD
 Actual directory structure and file organization
 
 ```
-my-slidev-presentations/
+Slidevs-on-Vercel/
 ├── pnpm-workspace.yaml          # Workspace configuration
 ├── package.json                 # Root package management
 ├── vercel.json                  # Deployment & routing settings
 ├── 
 ├── slides/                      # All presentations directory
-│   └── slidev-system/           # System overview presentation
+│   ├── slidev-system-ja/        # Japanese system overview presentation
+│   │   └── src/
+│   │       ├── slides.md        # Japanese slide content
+│   │       └── package.json     # Individual build config
+│   ├── slidev-system/           # English system overview presentation
+│   │   └── src/
+│   │       ├── slides.md        # This slide content!
+│   │       └── package.json     # Individual build config
+│   └── slidev-system-zh/        # Chinese system overview presentation
 │       └── src/
-│           ├── slides.md        # This slide content!
-│           └── package.json     # Individual build config
 │
 ├── dist/                        # Build artifacts
-│   ├── slidev-system/           # Built presentation
+│   ├── slidev-system-ja/        # Built Japanese presentation
+│   ├── slidev-system/           # Built English presentation
+│   ├── slidev-system-zh/        # Built Chinese presentation
 │   └── index.html               # Generated landing page
 │
 └── scripts/
@@ -207,18 +215,26 @@ Proper routing for multiple presentations
 {
   "rewrites": [
     { 
+      "source": "/slidev-system-ja/:path*", 
+      "destination": "/slidev-system-ja/:path*" 
+    },
+    { 
       "source": "/slidev-system/:path*", 
       "destination": "/slidev-system/:path*" 
+    },
+    { 
+      "source": "/slidev-system-zh/:path*", 
+      "destination": "/slidev-system-zh/:path*" 
     }
   ]
 }
 ```
 
 ## URL Structure
-- `https://my-slidev-eight.vercel.app/` - Landing page
-- `https://my-slidev-eight.vercel.app/slidev-system/` - This presentation
-- `https://my-slidev-eight.vercel.app/slidev-system/presenter/` - Presenter mode
-- `https://my-slidev-eight.vercel.app/slidev-system/overview/` - Overview mode
+- `https://slidevs-on-vercel.vercel.app/` - Landing page
+- `https://slidevs-on-vercel.vercel.app/slidev-system/` - This English presentation
+- `https://slidevs-on-vercel.vercel.app/slidev-system-ja/` - Japanese presentation
+- `https://slidevs-on-vercel.vercel.app/slidev-system-zh/` - Chinese presentation
 
 </v-clicks>
 
@@ -233,10 +249,12 @@ Integrated build management with root package.json
 ## Root package.json
 ```json
 {
-  "name": "my-slidev-presentations",
+  "name": "Slidevs-on-Vercel",
   "scripts": {
-    "build": "npm run build:slidev-system && npm run build:index",
+    "build": "npm run build:slidev-system-ja && npm run build:slidev-system && npm run build:slidev-system-zh && npm run build:index",
+    "build:slidev-system-ja": "cd slides/slidev-system-ja/src && npm run build",
     "build:slidev-system": "cd slides/slidev-system/src && npm run build",
+    "build:slidev-system-zh": "cd slides/slidev-system-zh/src && npm run build",
     "build:index": "node scripts/build-index.js",
     "dev:slidev-system": "cd slides/slidev-system/src && npm run dev"
   }
@@ -309,7 +327,7 @@ Recommendations for efficient development and operations
 <v-clicks>
 
 ## 📝 Directory Naming Conventions
-- **Kebab Case**: `getting-started`, `slidev-system`
+- **Kebab Case**: `slidev-system-ja`, `slidev-system`, `slidev-system-zh`
 - **Meaningful Names**: Content-descriptive naming
 - **URL Consideration**: Names become URLs directly
 
@@ -447,11 +465,11 @@ Project progress and achievements
 
 ## ✅ Completed Features
 - **Basic System**: pnpm workspace configuration
-- **Single Slide Demo**: SLIDEV-SYSTEM presentation
+- **Multi-language Demos**: Japanese, English, and Chinese presentations
 - **Auto Deployment**: Vercel integration
 - **Routing**: Multi-path support
 - **Documentation**: README.md setup
-- **OSS Ready**: English localization
+- **OSS Ready**: Multi-language localization
 
 ## 📊 Performance Metrics
 - **Build Time**: ~2 minutes
@@ -655,7 +673,7 @@ class: text-center
 </div>
 
 <div class="abs-br m-6 flex gap-2">
-  <a href="https://github.com/wwlapaki310/my-slidev-presentations" target="_blank" alt="GitHub" title="View Repository"
+  <a href="https://github.com/wwlapaki310/Slidevs-on-Vercel" target="_blank" alt="GitHub" title="View Repository"
     class="text-xl slidev-icon-btn opacity-50 !border-none !hover:text-white">
     <carbon-logo-github />
   </a>
@@ -676,7 +694,7 @@ class: text-center
 - [Vue.js Official](https://vuejs.org/)
 
 ## 🔗 Reference Implementations
-- [This Project](https://github.com/wwlapaki310/my-slidev-presentations)
+- [This Project](https://github.com/wwlapaki310/Slidevs-on-Vercel)
 - [antfu/talks](https://github.com/antfu/talks)
 - [Slidev Examples](https://github.com/slidevjs/slidev/tree/main/demo)
 
