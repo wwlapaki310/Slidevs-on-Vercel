@@ -30,7 +30,7 @@ mdc: true
   <button @click="$slidev.nav.openInEditor()" title="在编辑器中打开" class="text-xl slidev-icon-btn opacity-50 !border-none !hover:text-white">
     <carbon:edit />
   </button>
-  <a href="https://github.com/wwlapaki310/my-slidev-presentations" target="_blank" alt="GitHub" title="在 GitHub 中打开"
+  <a href="https://github.com/wwlapaki310/Slidevs-on-Vercel" target="_blank" alt="GitHub" title="在 GitHub 中打开"
     class="text-xl slidev-icon-btn opacity-50 !border-none !hover:text-white">
     <carbon-logo-github />
   </a>
@@ -70,21 +70,21 @@ transition: fade-out
 graph TD
     A[GitHub 代码仓库] --> B[pnpm 工作区]
     
-    B --> C1[getting-started/src/]
+    B --> C1[slidev-system-ja/src/]
     B --> C2[slidev-system/src/]
-    B --> C3[future-slides/src/]
+    B --> C3[slidev-system-zh/src/]
     
-    C1 --> D1[构建: /getting-started/]
+    C1 --> D1[构建: /slidev-system-ja/]
     C2 --> D2[构建: /slidev-system/]
-    C3 --> D3[构建: /future-slides/]
+    C3 --> D3[构建: /slidev-system-zh/]
     
     D1 --> E[Vercel 统一部署]
     D2 --> E
     D3 --> E
     
-    E --> F1[https://domain.com/getting-started/]
+    E --> F1[https://domain.com/slidev-system-ja/]
     E --> F2[https://domain.com/slidev-system/]
-    E --> F3[https://domain.com/future-slides/]
+    E --> F3[https://domain.com/slidev-system-zh/]
     E --> F4[https://domain.com/ - 主页]
     
     style A fill:#e1f5fe
@@ -99,19 +99,29 @@ graph TD
 实际的目录结构和文件组织
 
 ```
-my-slidev-presentations/
+Slidevs-on-Vercel/
 ├── pnpm-workspace.yaml          # 工作区配置
 ├── package.json                 # 根包管理
 ├── vercel.json                  # 部署和路由设置
 ├── 
 ├── slides/                      # 所有演示文稿目录
-│   └── slidev-system/           # 系统概览演示文稿
+│   ├── slidev-system-ja/        # 日语系统概览演示文稿
+│   │   └── src/
+│   │       ├── slides.md        # 日语幻灯片内容
+│   │       └── package.json     # 单独构建配置
+│   ├── slidev-system/           # 英语系统概览演示文稿
+│   │   └── src/
+│   │       ├── slides.md        # 英语幻灯片内容
+│   │       └── package.json     # 单独构建配置
+│   └── slidev-system-zh/        # 中文系统概览演示文稿
 │       └── src/
 │           ├── slides.md        # 这个幻灯片内容！
 │           └── package.json     # 单独构建配置
 │
 ├── dist/                        # 构建产物
-│   ├── slidev-system/           # 构建后的演示文稿
+│   ├── slidev-system-ja/        # 构建后的日语演示文稿
+│   ├── slidev-system/           # 构建后的英语演示文稿
+│   ├── slidev-system-zh/        # 构建后的中文演示文稿
 │   └── index.html               # 生成的主页
 │
 └── scripts/
@@ -176,9 +186,9 @@ packages:
 ## 单个幻灯片 package.json 示例
 ```json
 {
-  "name": "slidev-system",
+  "name": "slidev-system-zh",
   "scripts": {
-    "build": "slidev build --base /slidev-system/ --out ../../../dist/slidev-system"
+    "build": "slidev build --base /slidev-system-zh/ --out ../../../dist/slidev-system-zh"
   },
   "dependencies": {
     "@slidev/cli": "52.0.0",
@@ -207,6 +217,10 @@ packages:
 {
   "rewrites": [
     { 
+      "source": "/slidev-system-ja/:path*", 
+      "destination": "/slidev-system-ja/:path*" 
+    },
+    { 
       "source": "/slidev-system/:path*", 
       "destination": "/slidev-system/:path*" 
     },
@@ -219,11 +233,10 @@ packages:
 ```
 
 ## URL 结构
-- `https://my-slidev-eight.vercel.app/` - 主页
-- `https://my-slidev-eight.vercel.app/slidev-system/` - 英文演示文稿
-- `https://my-slidev-eight.vercel.app/slidev-system-zh/` - 这个中文演示文稿
-- `https://my-slidev-eight.vercel.app/slidev-system-zh/presenter/` - 演讲者模式
-- `https://my-slidev-eight.vercel.app/slidev-system-zh/overview/` - 概览模式
+- `https://slidevs-on-vercel.vercel.app/` - 主页
+- `https://slidevs-on-vercel.vercel.app/slidev-system-zh/` - 这个中文演示文稿
+- `https://slidevs-on-vercel.vercel.app/slidev-system/` - 英文演示文稿
+- `https://slidevs-on-vercel.vercel.app/slidev-system-ja/` - 日文演示文稿
 
 </v-clicks>
 
@@ -238,9 +251,10 @@ packages:
 ## 根 package.json
 ```json
 {
-  "name": "my-slidev-presentations",
+  "name": "Slidevs-on-Vercel",
   "scripts": {
-    "build": "npm run build:slidev-system && npm run build:slidev-system-zh && npm run build:index",
+    "build": "npm run build:slidev-system-ja && npm run build:slidev-system && npm run build:slidev-system-zh && npm run build:index",
+    "build:slidev-system-ja": "cd slides/slidev-system-ja/src && npm run build",
     "build:slidev-system": "cd slides/slidev-system/src && npm run build",
     "build:slidev-system-zh": "cd slides/slidev-system-zh/src && npm run build",
     "build:index": "node scripts/build-index.js",
@@ -315,7 +329,7 @@ packages:
 <v-clicks>
 
 ## 📝 目录命名约定
-- **短横线命名**: `getting-started`、`slidev-system`
+- **短横线命名**: `slidev-system-ja`、`slidev-system`、`slidev-system-zh`
 - **有意义的名称**: 内容描述性命名
 - **URL 考虑**: 名称直接成为 URL
 
@@ -351,7 +365,7 @@ packages:
 
 ### 404 错误
 - **原因**: Vercel 路由和基础路径不匹配
-- **症状**: 无法访问 `/slidev-system/`
+- **症状**: 无法访问 `/slidev-system-zh/`
 
 ### 构建复杂性
 - **原因**: 复杂的多幻灯片构建管理
@@ -453,7 +467,7 @@ packages:
 
 ## ✅ 已完成功能
 - **基础系统**: pnpm 工作区配置
-- **多语言演示**: 英文和中文版本
+- **多语言演示**: 日文、英文和中文版本
 - **自动部署**: Vercel 集成
 - **路由**: 多路径支持
 - **文档**: README.md 设置
@@ -661,7 +675,7 @@ class: text-center
 </div>
 
 <div class="abs-br m-6 flex gap-2">
-  <a href="https://github.com/wwlapaki310/my-slidev-presentations" target="_blank" alt="GitHub" title="查看代码仓库"
+  <a href="https://github.com/wwlapaki310/Slidevs-on-Vercel" target="_blank" alt="GitHub" title="查看代码仓库"
     class="text-xl slidev-icon-btn opacity-50 !border-none !hover:text-white">
     <carbon-logo-github />
   </a>
@@ -682,7 +696,7 @@ class: text-center
 - [Vue.js 官网](https://vuejs.org/)
 
 ## 🔗 参考实现
-- [本项目](https://github.com/wwlapaki310/my-slidev-presentations)
+- [本项目](https://github.com/wwlapaki310/Slidevs-on-Vercel)
 - [antfu/talks](https://github.com/antfu/talks)
 - [Slidev 示例](https://github.com/slidevjs/slidev/tree/main/demo)
 
