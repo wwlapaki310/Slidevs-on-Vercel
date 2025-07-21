@@ -13,6 +13,7 @@ drawings:
 transition: slide-left
 title: Slidev Multi-Slide Management System
 mdc: true
+presenter: build
 ---
 
 # Slidev × Vercel
